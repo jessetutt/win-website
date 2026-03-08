@@ -1,0 +1,634 @@
+// ════════════════════════════════
+//  BOOT VIDEO
+// ════════════════════════════════
+(function () {
+  const screen = document.getElementById('boot-screen');
+  const video  = document.getElementById('boot-video');
+  if (!screen || !video) return;
+
+  function dismissBoot() {
+    screen.classList.add('fade-out');
+    screen.addEventListener('transitionend', () => screen.remove(), { once: true });
+  }
+
+  video.addEventListener('ended', dismissBoot);
+  video.addEventListener('error', dismissBoot);
+  video.play().catch(dismissBoot);
+})();
+
+function reboot() {
+  hideDialog();
+  // Close all open windows
+  Object.keys(openWindows).forEach(t => closeWindow(t));
+
+  const screen = document.createElement('div');
+  screen.id = 'boot-screen';
+  screen.style.cssText = 'position:fixed;inset:0;background:#000;z-index:999999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s ease;';
+  screen.innerHTML = `
+    <video id="boot-video" playsinline style="width:100%;height:100%;object-fit:contain;background:#000;display:block;">
+      <source src="mmjdxbwbsb3b1.mp4" type="video/mp4">
+    </video>`;
+  document.body.appendChild(screen);
+
+  const vid = screen.querySelector('video');
+  function dismissReboot() {
+    screen.classList.add('fade-out');
+    screen.addEventListener('transitionend', () => screen.remove(), { once: true });
+  }
+  vid.addEventListener('ended', dismissReboot);
+  vid.addEventListener('error', dismissReboot);
+  vid.play().catch(dismissReboot);
+}
+
+// ════════════════════════════════
+//  STATE
+// ════════════════════════════════
+let windowZIndex = 1000;
+let activeWindow = null;
+const openWindows = {};
+
+// ════════════════════════════════
+//  ICONS  (URL-encoded inline SVG)
+// ════════════════════════════════
+const ICONS = {
+  files: `img/folder.png`,
+
+  computer: `img/my-computer.png`,
+
+  ie: `img/internet-explorer.png`,
+
+  drive: `img/hard-drive.png`,
+
+  recycle: `img/recycle-bin.png`,
+
+  notepad: `img/notepad.png`,
+
+  about: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='4' width='28' height='24' fill='%23c0c0c0'/%3E%3Crect x='2' y='4' width='28' height='1' fill='%23fff'/%3E%3Crect x='2' y='4' width='1' height='24' fill='%23fff'/%3E%3Crect x='29' y='4' width='1' height='24' fill='%23808080'/%3E%3Crect x='2' y='27' width='28' height='1' fill='%23808080'/%3E%3Crect x='3' y='5' width='26' height='10' fill='%23000080'/%3E%3Ctext x='16' y='14' text-anchor='middle' fill='%23fff' font-size='8' font-family='Arial' font-weight='bold'%3EWin95%3C/text%3E%3Crect x='6' y='18' width='6' height='6' fill='%23ff3333'/%3E%3Crect x='13' y='18' width='6' height='6' fill='%2333cc33'/%3E%3Crect x='6' y='22' width='6' height='6' fill='%233399ff'/%3E%3Crect x='13' y='22' width='6' height='6' fill='%23ffcc00'/%3E%3C/svg%3E`,
+};
+
+// ════════════════════════════════
+//  WINDOW DEFINITIONS
+// ════════════════════════════════
+const WINDOW_DEFS = {
+  computer: {
+    title: 'My Computer',
+    width: 500, height: 360,
+    icon: 'computer',
+    build: buildComputerWindow,
+  },
+  files: {
+    title: 'My Files',
+    width: 520, height: 380,
+    icon: 'files',
+    build: buildFilesWindow,
+  },
+  recycle: {
+    title: 'Recycle Bin',
+    width: 380, height: 300,
+    icon: 'recycle',
+    build: buildRecycleWindow,
+  },
+  ie: {
+    title: 'Internet Explorer',
+    width: 560, height: 400,
+    icon: 'ie',
+    build: buildIEWindow,
+  },
+  about: {
+    title: 'About Windows 95',
+    width: 340, height: 230,
+    icon: 'about',
+    build: buildAboutWindow,
+  },
+  notepad: {
+    title: 'Notepad - Untitled',
+    width: 430, height: 320,
+    icon: 'notepad',
+    build: buildNotepadWindow,
+  },
+};
+
+// ════════════════════════════════
+//  OPEN / CLOSE WINDOWS
+// ════════════════════════════════
+function openWindow(type) {
+  if (openWindows[type]) {
+    restoreWindow(type);
+    focusWindow(type);
+    return;
+  }
+
+  const def = WINDOW_DEFS[type];
+  if (!def) return;
+
+  const desktop = document.getElementById('desktop');
+  const dw = desktop.offsetWidth;
+  const dh = desktop.offsetHeight;
+  const count = Object.keys(openWindows).length;
+
+  const w = Math.min(def.width, dw - 40);
+  const h = Math.min(def.height, dh - 40);
+  const x = Math.max(20, Math.min(dw - w - 20, (dw - w) / 2 + count * 22));
+  const y = Math.max(20, Math.min(dh - h - 20, (dh - h) / 2 + count * 22));
+
+  const win = document.createElement('div');
+  win.className = 'window active';
+  win.id = 'win-' + type;
+  win.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+
+  win.innerHTML = `
+    <div class="window-titlebar" id="titlebar-${type}">
+      <img class="window-title-icon" src="${ICONS[def.icon] || ''}" alt="">
+      <span class="window-title">${def.title}</span>
+      <div class="window-controls">
+        <button class="win-btn" title="Minimize" onclick="minimizeWindow('${type}')">
+          <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="9" width="10" height="2" fill="#000"/></svg>
+        </button>
+        <button class="win-btn" title="Maximize" onclick="toggleMaximize('${type}')">
+          <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="10" height="10" fill="none" stroke="#000" stroke-width="1.5"/><rect x="1" y="1" width="10" height="3" fill="#000"/></svg>
+        </button>
+        <button class="win-btn win-btn-close" title="Close" onclick="closeWindow('${type}')">
+          <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="#000" stroke-width="2.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#000" stroke-width="2.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="window-body" id="wbody-${type}"></div>
+    <div class="resize-handle" id="resize-${type}"></div>
+  `;
+
+  desktop.appendChild(win);
+  openWindows[type] = { minimized: false, maximized: false, x, y, w, h };
+
+  def.build(document.getElementById('wbody-' + type), type);
+  focusWindow(type);
+  makeDraggable(win, document.getElementById('titlebar-' + type), type);
+  makeResizable(win, document.getElementById('resize-' + type), type);
+  addTaskbarBtn(type, def.title, def.icon);
+}
+
+// ════════════════════════════════
+//  CONTENT BUILDERS
+// ════════════════════════════════
+function buildFilesWindow(container) {
+  const files = [
+    { name: 'Documents', icon: ICONS.files },
+    { name: 'Photos',    icon: ICONS.files },
+    { name: 'Music',     icon: ICONS.files },
+    { name: 'readme.txt',  icon: ICONS.notepad },
+    { name: 'notes.txt',   icon: ICONS.notepad },
+    { name: 'report.txt',  icon: ICONS.notepad },
+  ];
+
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content">
+      <div class="file-grid">
+        ${files.map(f => `
+          <div class="file-item" onclick="selectFile(this)" ondblclick="openFileItem('${f.name}')">
+            <img src="${f.icon}" alt="">
+            <span class="file-label">${f.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">${files.length} object(s)</span>
+    </div>
+  `;
+}
+
+function buildComputerWindow(container) {
+  const drives = [
+    { name: 'Floppy (A:)',      icon: ICONS.drive },
+    { name: 'Floppy (B:)',      icon: ICONS.drive },
+    { name: 'Local Disk (C:)',  icon: ICONS.drive },
+    { name: 'My Files',         icon: ICONS.files },
+    { name: 'Control Panel',    icon: ICONS.about },
+    { name: 'Printers',         icon: ICONS.about },
+  ];
+
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content">
+      <div class="file-grid">
+        ${drives.map(d => `
+          <div class="file-item" onclick="selectFile(this)" ondblclick="${d.name === 'My Files' ? "openWindow('files')" : ''}">
+            <img src="${d.icon}" alt="">
+            <span class="file-label">${d.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">${drives.length} object(s)</span>
+    </div>
+  `;
+}
+
+function buildRecycleWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">View</span>
+      <span class="menu-item">Help</span>
+    </div>
+    <div class="window-content">
+      <div class="recycle-empty">
+        <svg width="72" height="72" viewBox="0 0 32 32">
+          <rect x="12" y="2" width="8" height="2" fill="#6868c8"/>
+          <rect x="12" y="2" width="8" height="1" fill="#a8a8f8"/>
+          <rect x="4" y="4" width="24" height="3" fill="#7878d8"/>
+          <rect x="4" y="4" width="24" height="1" fill="#b8b8ff"/>
+          <rect x="4" y="4" width="1" height="3" fill="#b8b8ff"/>
+          <rect x="27" y="4" width="1" height="3" fill="#3030a0"/>
+          <rect x="4" y="6" width="24" height="1" fill="#3030a0"/>
+          <rect x="6" y="7" width="20" height="21" fill="#4848b8"/>
+          <rect x="6" y="7" width="20" height="1" fill="#9898e8"/>
+          <rect x="6" y="7" width="1" height="21" fill="#9898e8"/>
+          <rect x="25" y="7" width="1" height="21" fill="#2020a0"/>
+          <rect x="6" y="27" width="20" height="1" fill="#2020a0"/>
+          <polygon points="16,11 19,15 17.5,15 17.5,18 14.5,18 14.5,15 13,15" fill="white"/>
+          <g transform="translate(16,17) rotate(120) translate(-16,-17)">
+            <polygon points="16,11 19,15 17.5,15 17.5,18 14.5,18 14.5,15 13,15" fill="white"/>
+          </g>
+          <g transform="translate(16,17) rotate(240) translate(-16,-17)">
+            <polygon points="16,11 19,15 17.5,15 17.5,18 14.5,18 14.5,15 13,15" fill="white"/>
+          </g>
+        </svg>
+        <span>The Recycle Bin is empty.</span>
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">0 object(s)</span>
+    </div>
+  `;
+}
+
+function buildIEWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item">F<u>a</u>vorites</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-toolbar">
+      <button class="toolbar-btn" title="Back">&#x2190;</button>
+      <button class="toolbar-btn" title="Forward">&#x2192;</button>
+      <button class="toolbar-btn" title="Stop">&#x2716;</button>
+      <button class="toolbar-btn" title="Refresh">&#x21BB;</button>
+      <button class="toolbar-btn" title="Home">&#x2302;</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" title="Favorites">&#x2605;</button>
+    </div>
+    <div class="address-bar">
+      <span class="address-label">Address</span>
+      <input class="address-input" type="text" value="about:blank" readonly>
+    </div>
+    <div class="window-content" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:#fff;">
+      <img src="img/internet-explorer.png" style="width:64px;height:64px;image-rendering:pixelated;">
+      <div style="font-family:'w95fa','MS Sans Serif',sans-serif;font-size:13px;color:#000080;font-weight:bold;">Internet Explorer 4.0</div>
+      <div style="font-family:'w95fa','MS Sans Serif',sans-serif;font-size:11px;color:#808080;">Cannot find server or DNS Error</div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">Done</span>
+      <span class="status-item">Internet zone</span>
+    </div>
+  `;
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+}
+
+function buildAboutWindow(container) {
+  container.innerHTML = `
+    <div class="window-content" style="display:flex;flex-direction:column;">
+      <div style="background:#000080;padding:14px 16px;display:flex;align-items:center;gap:14px;">
+        <svg width="44" height="44" viewBox="0 0 20 20">
+          <rect x="0" y="0" width="9" height="9" fill="#ff3333"/>
+          <rect x="11" y="0" width="9" height="9" fill="#33cc33"/>
+          <rect x="0" y="11" width="9" height="9" fill="#3399ff"/>
+          <rect x="11" y="11" width="9" height="9" fill="#ffcc00"/>
+        </svg>
+        <div>
+          <div style="color:#fff;font-size:20px;font-weight:bold;font-family:'MS Sans Serif',Arial,sans-serif;letter-spacing:0.5px;">Windows 95</div>
+          <div style="color:#aac;font-size:11px;margin-top:2px;font-family:'MS Sans Serif',Arial,sans-serif;">Version 4.00.950</div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;font-family:'MS Sans Serif',Arial,sans-serif;font-size:12px;background:#fff;flex:1;">
+        <div style="border-bottom:1px solid #c0c0c0;padding-bottom:10px;margin-bottom:10px;">
+          <p>This product is licensed to:</p>
+          <p style="font-weight:bold;margin:4px 0 2px;">User</p>
+          <p style="color:#444;font-size:11px;">Windows 95 Web Emulator</p>
+        </div>
+        <p style="font-size:11px;color:#808080;line-height:1.7;">
+          Microsoft Corporation. All rights reserved.<br>
+          This web emulator is for demonstration purposes only.
+        </p>
+      </div>
+    </div>
+    <div style="padding:8px;display:flex;justify-content:center;background:#c0c0c0;">
+      <button class="dialog-btn" style="min-width:80px;" onclick="closeWindow('about')">OK</button>
+    </div>
+  `;
+}
+
+function buildNotepadWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">Search</span>
+      <span class="menu-item">Help</span>
+    </div>
+    <div style="flex:1;margin:2px;display:flex;">
+      <textarea style="
+        flex:1;width:100%;resize:none;
+        border:2px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;
+        box-shadow:inset 1px 1px 0 #404040;
+        font-family:'Courier New',Courier,monospace;font-size:13px;
+        padding:4px;background:#fff;outline:none;line-height:1.5;
+        color:#000;
+      "></textarea>
+    </div>
+  `;
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+}
+
+// ════════════════════════════════
+//  WINDOW MANAGEMENT
+// ════════════════════════════════
+function focusWindow(type) {
+  document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
+  document.querySelectorAll('.taskbar-btn').forEach(b => b.classList.remove('active'));
+
+  const win = document.getElementById('win-' + type);
+  if (!win) return;
+  win.classList.add('active');
+  win.style.zIndex = ++windowZIndex;
+  activeWindow = type;
+
+  const tb = document.getElementById('tbtn-' + type);
+  if (tb) tb.classList.add('active');
+}
+
+function minimizeWindow(type) {
+  const win = document.getElementById('win-' + type);
+  if (!win) return;
+  win.style.display = 'none';
+  openWindows[type].minimized = true;
+  const tb = document.getElementById('tbtn-' + type);
+  if (tb) tb.classList.remove('active');
+  activeWindow = null;
+}
+
+function restoreWindow(type) {
+  const win = document.getElementById('win-' + type);
+  if (!win) return;
+  win.style.display = 'flex';
+  openWindows[type].minimized = false;
+}
+
+function toggleMaximize(type) {
+  const win = document.getElementById('win-' + type);
+  if (!win) return;
+  const state = openWindows[type];
+
+  if (state.maximized) {
+    win.classList.remove('maximized');
+    win.style.left   = state.x + 'px';
+    win.style.top    = state.y + 'px';
+    win.style.width  = state.w + 'px';
+    win.style.height = state.h + 'px';
+    state.maximized = false;
+  } else {
+    state.x = parseInt(win.style.left);
+    state.y = parseInt(win.style.top);
+    state.w = win.offsetWidth;
+    state.h = win.offsetHeight;
+    win.classList.add('maximized');
+    state.maximized = true;
+  }
+  focusWindow(type);
+}
+
+function closeWindow(type) {
+  const win = document.getElementById('win-' + type);
+  if (win) win.remove();
+  const tb = document.getElementById('tbtn-' + type);
+  if (tb) tb.remove();
+  delete openWindows[type];
+  activeWindow = null;
+}
+
+// ════════════════════════════════
+//  TASKBAR
+// ════════════════════════════════
+function addTaskbarBtn(type, title, iconKey) {
+  const bar = document.getElementById('taskbar-windows');
+  const btn = document.createElement('button');
+  btn.className = 'taskbar-btn active';
+  btn.id = 'tbtn-' + type;
+  btn.innerHTML = `<img src="${ICONS[iconKey] || ''}" alt=""><span>${title}</span>`;
+  btn.onclick = () => {
+    if (openWindows[type].minimized) {
+      restoreWindow(type);
+      focusWindow(type);
+    } else if (activeWindow === type) {
+      minimizeWindow(type);
+    } else {
+      restoreWindow(type);
+      focusWindow(type);
+    }
+  };
+  bar.appendChild(btn);
+}
+
+// ════════════════════════════════
+//  DRAG
+// ════════════════════════════════
+function makeDraggable(win, handle, type) {
+  let startX, startY, startL, startT, dragging = false;
+
+  const onDown = (cx, cy) => {
+    if (openWindows[type].maximized) return;
+    dragging = true;
+    startX = cx; startY = cy;
+    startL = parseInt(win.style.left) || 0;
+    startT = parseInt(win.style.top) || 0;
+    focusWindow(type);
+  };
+
+  const onMove = (cx, cy) => {
+    if (!dragging) return;
+    const desktop = document.getElementById('desktop');
+    const nx = Math.max(0, Math.min(desktop.offsetWidth  - win.offsetWidth,  startL + cx - startX));
+    const ny = Math.max(0, Math.min(desktop.offsetHeight - win.offsetHeight, startT + cy - startY));
+    win.style.left = nx + 'px';
+    win.style.top  = ny + 'px';
+  };
+
+  handle.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('win-btn')) return;
+    onDown(e.clientX, e.clientY);
+    e.preventDefault();
+  });
+  handle.addEventListener('touchstart', e => {
+    if (e.target.classList.contains('win-btn')) return;
+    onDown(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  document.addEventListener('mousemove',  e => onMove(e.clientX, e.clientY));
+  document.addEventListener('touchmove',  e => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  document.addEventListener('mouseup',    () => { dragging = false; });
+  document.addEventListener('touchend',   () => { dragging = false; });
+
+  win.addEventListener('mousedown', () => focusWindow(type));
+}
+
+// ════════════════════════════════
+//  RESIZE
+// ════════════════════════════════
+function makeResizable(win, handle, type) {
+  let startX, startY, startW, startH, resizing = false;
+
+  handle.addEventListener('mousedown', e => {
+    if (openWindows[type].maximized) return;
+    resizing = true;
+    startX = e.clientX; startY = e.clientY;
+    startW = win.offsetWidth; startH = win.offsetHeight;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!resizing) return;
+    win.style.width  = Math.max(220, startW + e.clientX - startX) + 'px';
+    win.style.height = Math.max(160, startH + e.clientY - startY) + 'px';
+  });
+  document.addEventListener('mouseup', () => { resizing = false; });
+}
+
+// ════════════════════════════════
+//  START MENU
+// ════════════════════════════════
+function toggleStartMenu(e) {
+  e.stopPropagation();
+  document.getElementById('start-menu').classList.toggle('visible');
+  document.getElementById('start-btn').classList.toggle('pressed');
+}
+function closeStartMenu() {
+  document.getElementById('start-menu').classList.remove('visible');
+  document.getElementById('start-btn').classList.remove('pressed');
+}
+
+// ════════════════════════════════
+//  CONTEXT MENU
+// ════════════════════════════════
+function showContextMenu(e) {
+  e.preventDefault();
+  const menu = document.getElementById('context-menu');
+  const x = Math.min(e.clientX, window.innerWidth  - 170);
+  const y = Math.min(e.clientY, window.innerHeight - 120);
+  menu.style.left = x + 'px';
+  menu.style.top  = y + 'px';
+  menu.classList.add('visible');
+}
+function hideContextMenu() {
+  document.getElementById('context-menu').classList.remove('visible');
+}
+
+// ════════════════════════════════
+//  DESKTOP / ICON INTERACTIONS
+// ════════════════════════════════
+function desktopClick(e) {
+  closeStartMenu();
+  hideContextMenu();
+  if (e.target === document.getElementById('desktop')) {
+    document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+  }
+}
+
+function selectIcon(e, id) {
+  e.stopPropagation();
+  document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+  document.getElementById(id).classList.add('selected');
+}
+
+function selectFile(el) {
+  el.closest('.window-content').querySelectorAll('.file-item').forEach(f => f.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function openFileItem(name) {
+  if (name.endsWith('.txt')) openWindow('notepad');
+}
+
+// ════════════════════════════════
+//  SHUTDOWN / DIALOG
+// ════════════════════════════════
+function showShutdown() {
+  const radio = document.querySelector('input[name="shutdown-opt"][value="shutdown"]');
+  if (radio) radio.checked = true;
+  document.getElementById('dialog-overlay').classList.add('visible');
+}
+function hideDialog() {
+  document.getElementById('dialog-overlay').classList.remove('visible');
+}
+function doShutdownAction() {
+  const opt = (document.querySelector('input[name="shutdown-opt"]:checked') || {}).value || 'shutdown';
+  hideDialog();
+  if (opt === 'restart') {
+    reboot();
+  } else if (opt === 'msdos') {
+    document.body.innerHTML = `
+      <div style="background:#000;width:100vw;height:100vh;padding:16px;font-family:'Courier New',monospace;color:#aaa;font-size:14px;">
+        <p>Microsoft(R) Windows 95</p>
+        <p style="margin-top:4px;">C:\\&gt;<span style="border-left:8px solid #aaa;animation:blink 1s step-start infinite;">&nbsp;</span></p>
+        <style>@keyframes blink{50%{opacity:0}}</style>
+        <p style="margin-top:40px;font-size:11px;color:#555;">MS-DOS Mode &mdash; <a onclick="location.reload()" style="color:#777;cursor:pointer;text-decoration:underline;">Restart Windows</a></p>
+      </div>`;
+  } else {
+    document.body.innerHTML = `
+      <div style="background:#000;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
+        <p style="color:#fff;font-family:'MS Sans Serif',Arial,sans-serif;font-size:16px;text-align:center;">
+          It is now safe to turn off your computer.
+        </p>
+        <button onclick="location.reload()" style="padding:6px 24px;font-size:12px;cursor:pointer;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:0 0 0 1px #000;font-family:'MS Sans Serif',Arial,sans-serif;">
+          Restart
+        </button>
+      </div>`;
+  }
+}
+
+// ════════════════════════════════
+//  CLOCK
+// ════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('clock').textContent = h + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ════════════════════════════════
+//  GLOBAL CLICK HANDLERS
+// ════════════════════════════════
+document.addEventListener('click', e => {
+  if (!e.target.closest('#start-menu') && !e.target.closest('#start-btn')) closeStartMenu();
+  if (!e.target.closest('#context-menu')) hideContextMenu();
+});
