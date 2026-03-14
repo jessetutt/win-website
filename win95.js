@@ -17,27 +17,41 @@
 })();
 
 function reboot() {
-  hideDialog();
-  // Close all open windows
-  Object.keys(openWindows).forEach(t => closeWindow(t));
+  // Close all open windows and clear backdrop
+  [...Object.keys(openWindows)].forEach(t => closeWindow(t));
+  const backdrop = document.getElementById('shutdown-backdrop');
+  if (backdrop) backdrop.remove();
 
   const screen = document.createElement('div');
   screen.id = 'boot-screen';
-  screen.style.cssText = 'position:fixed;inset:0;background:#000;z-index:999999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s ease;';
-  screen.innerHTML = `
-    <video id="boot-video" playsinline style="width:100%;height:100%;object-fit:contain;background:#000;display:block;">
-      <source src="mmjdxbwbsb3b1.mp4" type="video/mp4">
-    </video>`;
+  screen.style.cssText = 'position:fixed;inset:0;background:#000;z-index:999999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s ease;cursor:default;';
+
+  const clickMsg = document.createElement('div');
+  clickMsg.style.cssText = 'display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:16px;cursor:pointer;';
+  clickMsg.innerHTML = `<p style="color:#fff;font-family:'MS Sans Serif',sans-serif;font-size:16px;animation:blinkText 1.2s step-start infinite;">Click to start Windows 95</p>`;
+
+  screen.innerHTML = `<video id="reboot-video" playsinline muted autoplay style="width:100%;height:100%;object-fit:contain;background:#000;display:block;"><source src="mmjdxbwbsb3b1.mp4" type="video/mp4"></video>`;
+  screen.appendChild(clickMsg);
   document.body.appendChild(screen);
 
-  const vid = screen.querySelector('video');
   function dismissReboot() {
-    screen.classList.add('fade-out');
+    screen.style.transition = 'opacity 0.5s ease';
+    screen.style.opacity = '0';
     screen.addEventListener('transitionend', () => screen.remove(), { once: true });
   }
+
+  const vid = document.getElementById('reboot-video');
   vid.addEventListener('ended', dismissReboot);
-  vid.addEventListener('error', dismissReboot);
-  vid.play().catch(dismissReboot);
+  vid.addEventListener('error', () => {
+    clickMsg.style.display = 'flex';
+    clickMsg.addEventListener('click', dismissReboot, { once: true });
+  });
+  vid.play().catch(() => {
+    clickMsg.style.display = 'flex';
+    clickMsg.addEventListener('click', () => {
+      vid.play().then(() => { clickMsg.style.display = 'none'; }).catch(dismissReboot);
+    }, { once: true });
+  });
 }
 
 // ════════════════════════════════
@@ -103,8 +117,10 @@ const WINDOW_DEFS = {
   },
   welcome: {
     title: 'Welcome',
-    width: 500, height: 340,
+    width: 480, height: 380,
     icon: 'about',
+    noIcon: true,
+    noResize: true,
     build: buildWelcomeWindow,
   },
   shutdown: {
@@ -367,71 +383,78 @@ function buildAboutWindow(container) {
 }
 
 const TIPS = [
-  "You can use Windows Explorer to see all the files on your computer.",
-  "You can use the Start button to find files on your computer.",
-  "To find a file, click the Start button, point to Find, and then click Files or Folders.",
-  "To adjust the volume, double-click the speaker icon in the taskbar.",
-  "You can drag icons on the desktop to arrange them however you like.",
-  "Right-click the desktop to change your display settings.",
+  { text: "To open a program, you just click the Start button, and then click the program's icon." },
+  { text: "You can use Windows Explorer to see all the files on your computer." },
+  { text: "To find a file, click the Start button, point to Find, and then click Files or Folders." },
+  { text: "To adjust the volume, double-click the speaker icon in the taskbar." },
+  { text: "You can drag icons on the desktop to rearrange them however you like." },
+  { text: "Right-click the desktop to change your wallpaper and display settings." },
 ];
 let tipIndex = 0;
 
+const MONITOR_SVG = `<svg width="130" height="110" viewBox="0 0 130 110" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Monitor outer body -->
+  <rect x="4" y="4" width="100" height="76" rx="4" fill="#c0c0c0" stroke="#808080" stroke-width="1"/>
+  <rect x="4" y="4" width="100" height="2" fill="#dfdfdf"/>
+  <rect x="4" y="4" width="2" height="76" fill="#dfdfdf"/>
+  <rect x="103" y="4" width="1" height="76" fill="#808080"/>
+  <rect x="4" y="79" width="100" height="1" fill="#808080"/>
+  <!-- Screen bezel (inset) -->
+  <rect x="10" y="10" width="88" height="62" fill="#404040"/>
+  <rect x="10" y="10" width="88" height="1" fill="#606060"/>
+  <rect x="10" y="10" width="1" height="62" fill="#606060"/>
+  <!-- Screen -->
+  <rect x="13" y="13" width="82" height="56" fill="#008080"/>
+  <!-- Taskbar on screen -->
+  <rect x="13" y="60" width="82" height="9" fill="#c0c0c0"/>
+  <!-- Start button on screen -->
+  <rect x="15" y="61" width="18" height="7" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+  <!-- Cursor arrow (pointing down-left) -->
+  <polygon points="32,20 32,42 37,37 40,44 43,43 40,36 46,36" fill="#00e5e5"/>
+  <polygon points="32,20 32,42 37,37 40,44 43,43 40,36 46,36" fill="none" stroke="#000" stroke-width="0.5"/>
+  <!-- Monitor bottom strip -->
+  <rect x="4" y="80" width="100" height="6" rx="0" fill="#b0b0b0" stroke="#808080" stroke-width="0.5"/>
+  <!-- Power LED -->
+  <rect x="93" y="82" width="4" height="2" fill="#00cc00"/>
+  <!-- Neck -->
+  <rect x="44" y="86" width="20" height="8" fill="#a8a8a8" stroke="#808080" stroke-width="0.5"/>
+  <!-- Base -->
+  <rect x="28" y="94" width="52" height="8" rx="2" fill="#a8a8a8" stroke="#808080" stroke-width="0.5"/>
+  <rect x="28" y="94" width="52" height="1" fill="#c0c0c0"/>
+</svg>`;
+
 function buildWelcomeWindow(container) {
-  function renderTip() {
-    const el = container.querySelector('#welcome-tip-text');
-    if (el) el.textContent = TIPS[tipIndex];
-  }
-
   container.innerHTML = `
-    <div style="display:flex;flex-direction:column;height:100%;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;">
+    <div style="display:flex;flex-direction:column;height:100%;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;background:var(--c-material);">
 
-      <!-- Header -->
-      <div style="background:#fff;padding:12px 16px 10px;border-bottom:1px solid var(--c-border-dark);display:flex;align-items:baseline;gap:0;">
-        <span style="font-size:24px;font-weight:normal;color:#000;">Welcome to </span>
-        <span style="font-size:24px;font-weight:bold;color:#000;">Windows</span>
-        <span style="font-size:24px;font-weight:bold;color:#c00000;">95</span>
+      <!-- Header: grey background -->
+      <div style="padding:10px 14px 6px;flex-shrink:0;">
+        <span style="font-size:22px;font-weight:normal;color:#000;">Welcome to </span><span style="font-size:22px;font-weight:900;color:#000;-webkit-text-stroke:0.8px #000;">Windows</span><span style="font-size:22px;font-weight:normal;color:#fff;">95</span>
       </div>
 
-      <!-- Body -->
-      <div style="display:flex;flex:1;padding:10px;gap:8px;background:var(--c-material);overflow:hidden;">
+      <!-- Main row: yellow box + buttons -->
+      <div style="display:flex;flex:1;padding:0 8px 8px;gap:8px;align-items:stretch;min-height:0;overflow:hidden;">
 
-        <!-- Left: Did you know panel -->
-        <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;">
-          <div style="background:#fff;padding:6px 8px;border:2px solid;border-top-color:var(--c-border-dark);border-left-color:var(--c-border-dark);border-bottom-color:var(--c-border-lightest);border-right-color:var(--c-border-lightest);box-shadow:var(--shadow-input);display:flex;align-items:center;gap:8px;">
-            <svg width="28" height="28" viewBox="0 0 32 32" style="flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="13" r="9" fill="#ffdd00" stroke="#000" stroke-width="1"/>
-              <rect x="13" y="22" width="6" height="2" fill="#ffdd00" stroke="#000" stroke-width="0.5"/>
-              <rect x="13" y="24" width="6" height="2" fill="#ffdd00" stroke="#000" stroke-width="0.5"/>
-              <rect x="14" y="9" width="4" height="7" fill="#000" rx="1"/>
-              <circle cx="16" cy="18" r="1.5" fill="#000"/>
-            </svg>
-            <span style="font-size:12px;font-weight:bold;">Did you know...</span>
+        <!-- Yellow sunken box: headshot left, text right -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px;align-items:center;background:#ffff99;border:2px solid;border-top-color:var(--c-border-dark);border-left-color:var(--c-border-dark);border-bottom-color:var(--c-border-lightest);border-right-color:var(--c-border-lightest);box-shadow:inset 1px 1px 0 var(--c-border-darkest);padding:12px;min-height:0;">
+          <div style="width:100%;">
+            <div style="font-size:14px;font-weight:bold;margin-bottom:6px;">Welcome to my Windows 95 portfolio website.</div>
+            <div style="font-size:12px;line-height:1.6;">I decided to vibe code this nostalgic portfolio website with Claude Code. I hope you enjoy it!</div>
           </div>
-          <div style="flex:1;background:repeating-linear-gradient(to bottom,#ffffc0 0px,#ffffc0 18px,#ffff80 18px,#ffff80 19px);border:2px solid;border-top-color:var(--c-border-dark);border-left-color:var(--c-border-dark);border-bottom-color:var(--c-border-lightest);border-right-color:var(--c-border-lightest);box-shadow:var(--shadow-input);padding:8px 10px;font-size:12px;line-height:19px;overflow:hidden;">
-            <span id="welcome-tip-text">${TIPS[tipIndex]}</span>
-          </div>
+          <img src="img/headshot.png" style="width:140px;height:140px;image-rendering:pixelated;display:block;flex-shrink:0;">
         </div>
 
-        <!-- Right: Buttons -->
-        <div style="display:flex;flex-direction:column;gap:4px;width:140px;flex-shrink:0;">
-          <button class="dialog-btn" style="width:100%;height:28px;text-align:left;padding:0 8px;"><u>W</u>indows Tour</button>
-          <button class="dialog-btn" style="width:100%;height:28px;text-align:left;padding:0 8px;">What's <u>N</u>ew</button>
-          <button class="dialog-btn" style="width:100%;height:28px;text-align:left;padding:0 8px;"><u>O</u>nline Registration</button>
-          <button class="dialog-btn" style="width:100%;height:28px;text-align:left;padding:0 8px;"><u>P</u>roduct Catalog</button>
-          <button class="dialog-btn" style="width:100%;height:28px;text-align:left;padding:0 8px;" onclick="tipIndex=(tipIndex+1)%TIPS.length;(function(){var el=document.querySelector('#welcome-tip-text');if(el)el.textContent=TIPS[tipIndex];})()">Next <u>T</u>ip</button>
+        <!-- Right: buttons -->
+        <div style="display:flex;flex-direction:column;gap:4px;width:130px;flex-shrink:0;">
+          <button class="dialog-btn" style="width:100%;">What's <u>N</u>ew</button>
+          <button class="dialog-btn" style="width:100%;"><u>O</u>nline Registration</button>
+          <div style="flex:1;"></div>
+          <div style="height:1px;background:var(--c-border-dark);margin-bottom:2px;box-shadow:0 1px 0 var(--c-border-lightest);"></div>
+          <div style="height:30px;"></div>
+          <button class="dialog-btn" style="width:100%;" onclick="closeWindow('welcome')"><u>C</u>lose</button>
         </div>
 
       </div>
-
-      <!-- Footer -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--c-material);border-top:1px solid var(--c-border-dark);">
-        <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;">
-          <input type="checkbox" checked style="cursor:pointer;accent-color:#000080;">
-          Show this Welcome Screen next time you start Windows
-        </label>
-        <button class="dialog-btn" style="min-width:70px;" onclick="closeWindow('welcome')">Close</button>
-      </div>
-
     </div>
   `;
   container.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;';
@@ -768,21 +791,68 @@ function doShutdownAction() {
       </div>`;
   } else if (opt === 'msdos') {
     document.body.innerHTML = `
-      <div style="background:#000;width:100vw;height:100vh;padding:16px;font-family:'Courier New',monospace;color:#aaa;font-size:14px;">
-        <p>Microsoft(R) Windows 95</p>
-        <p style="margin-top:4px;">C:\\&gt;<span style="border-left:8px solid #aaa;animation:blink 1s step-start infinite;">&nbsp;</span></p>
-        <style>@keyframes blink{50%{opacity:0}}</style>
-        <p style="margin-top:40px;font-size:11px;color:#555;">MS-DOS Mode &mdash; <a onclick="location.reload()" style="color:#777;cursor:pointer;text-decoration:underline;">Restart Windows</a></p>
+      <style>
+        #dos-screen { background:#000; width:100vw; height:100vh; padding:12px 16px; font-family:'Courier New',Courier,monospace; font-size:16px; color:#aaaaaa; overflow:hidden; display:flex; flex-direction:column; cursor:text; box-sizing:border-box; }
+        #dos-output { white-space:pre-wrap; word-break:break-all; }
+        #dos-input-line { display:flex; align-items:center; }
+        #dos-prompt { white-space:nowrap; }
+        #dos-input { background:transparent; border:none; outline:none; color:#aaaaaa; font-family:'Courier New',Courier,monospace; font-size:16px; flex:1; caret-color:#aaaaaa; padding:0; margin:0; }
+        @keyframes dosBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+      </style>
+      <div id="dos-screen" onclick="document.getElementById('dos-input').focus()">
+        <div id="dos-output">Microsoft(R) MS-DOS(R) Version 7.0
+           (C)Copyright Microsoft Corp 1981-1995.
+
+</div>
+        <div id="dos-input-line">
+          <span id="dos-prompt">C:\\&gt;</span>
+          <input id="dos-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
       </div>`;
+
+    const input = document.getElementById('dos-input');
+    const output = document.getElementById('dos-output');
+    input.focus();
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      const cmd = input.value.trim();
+      input.value = '';
+      const line = 'C:\\>' + cmd + '\n';
+
+      const responses = {
+        '': '',
+        'cls': '__CLEAR__',
+        'ver': 'MS-DOS Version 7.0\n',
+        'dir': ' Volume in drive C has no label\n Volume Serial Number is 1A2B-3C4D\n\n Directory of C:\\\n\nWINDOWS      <DIR>        03-14-96  12:00p\nCOMMAND  COM       54,619  03-14-96  12:00p\nCONFIG   SYS          256  03-14-96  12:00p\nAUTOEXEC BAT          128  03-14-96  12:00p\n         2 file(s)         54,875 bytes\n         1 dir(s)     524,288,000 bytes free\n',
+        'help': 'For more information on a specific command, type HELP command-name\nCLS       COMMAND   DIR       ECHO      EXIT\nMEM       TIME      VER       VOL\n',
+        'mem': '655,360 bytes total conventional memory\n655,360 bytes available to MS-DOS\n619,264 largest executable program size\n\n7,340,032 bytes total contiguous extended memory\n        0 bytes available contiguous extended memory\n6,553,600 bytes available XMS memory\n  MS-DOS resident in High Memory Area\n',
+        'time': 'Current time is ' + new Date().toLocaleTimeString() + '\nEnter new time: ',
+        'date': 'Current date is ' + new Date().toLocaleDateString('en-US',{weekday:'short',month:'2-digit',day:'2-digit',year:'numeric'}) + '\nEnter new date (mm-dd-yy): ',
+        'vol':  'Volume in drive C has no label\nVolume Serial Number is 1A2B-3C4D\n',
+        'exit': '__EXIT__',
+        'win':  '__EXIT__',
+      };
+
+      const key = cmd.toLowerCase().split(' ')[0];
+      const response = responses.hasOwnProperty(key) ? responses[key] : (cmd ? 'Bad command or file name\n' : '');
+
+      if (response === '__CLEAR__') {
+        output.textContent = '';
+      } else if (response === '__EXIT__') {
+        output.textContent += line;
+        output.textContent += 'Restarting Windows 95...\n';
+        setTimeout(() => location.reload(), 1200);
+      } else {
+        output.textContent += line + response + '\n';
+        output.scrollTop = output.scrollHeight;
+      }
+    });
+
   } else {
     document.body.innerHTML = `
-      <div style="background:#000;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
-        <p style="color:#fff;font-family:'MS Sans Serif',Arial,sans-serif;font-size:16px;text-align:center;">
-          It is now safe to turn off your computer.
-        </p>
-        <button onclick="location.reload()" style="padding:6px 24px;font-size:12px;cursor:pointer;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:0 0 0 1px #000;font-family:'MS Sans Serif',Arial,sans-serif;">
-          Restart
-        </button>
+      <div style="background:#000;width:100vw;height:100vh;overflow:hidden;">
+        <img src="img/shutdown-screen.jpg" style="width:100%;height:100%;object-fit:cover;">
       </div>`;
   }
 }
@@ -807,3 +877,6 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#start-menu') && !e.target.closest('#start-btn')) closeStartMenu();
   if (!e.target.closest('#context-menu')) hideContextMenu();
 });
+
+// Auto-open Welcome on load
+window.addEventListener('load', () => openWindow('welcome'));

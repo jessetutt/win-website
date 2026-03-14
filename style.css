@@ -128,7 +128,7 @@ body {
   position: absolute;
   width: 76px;
   text-align: center;
-  cursor: pointer;
+  cursor: default;
   padding: 4px;
 }
 .desktop-icon:hover .icon-label,
@@ -569,7 +569,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 10px 8px 8px;
-  cursor: pointer;
+  cursor: default;
   width: 110px;
 }
 .file-item:hover .file-label,
