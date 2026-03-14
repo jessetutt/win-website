@@ -1,0 +1,765 @@
+// ════════════════════════════════
+//  CONTENT BUILDERS
+// ════════════════════════════════
+function buildFilesWindow(container) {
+  const files = [
+    { name: 'Documents', icon: ICONS.files },
+    { name: 'Photos',    icon: ICONS.files },
+    { name: 'Nat Miletic Bio', icon: ICONS.notepad },
+  ];
+
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content">
+      <div class="file-grid">
+        ${files.map(f => `
+          <div class="file-item" onclick="selectFile(this)" ondblclick="openFileItem('${f.name}')">
+            <img src="${f.icon}" alt="">
+            <span class="file-label">${f.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">${files.length} object(s)</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+}
+
+function buildDocumentsWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content"></div>
+    <div class="status-bar">
+      <span class="status-item">0 object(s)</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+}
+
+function buildPhotosWindow(container) {
+  const photos = [
+    { name: 'Nat Miletic Headshot', src: 'img/headshot.png', icon: ICONS.imageFile },
+  ];
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content">
+      <div class="file-grid">
+        ${photos.map(p => `
+          <div class="file-item" onclick="selectFile(this)" ondblclick="openImageInPaint('${p.src}','${p.name}')">
+            <img src="${p.icon}" alt="">
+            <span class="file-label">${p.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">${photos.length} object(s)</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+}
+
+function buildComputerWindow(container) {
+  const drives = [
+    { name: 'Floppy (A:)',      icon: ICONS.floppy },
+    { name: 'Local Disk (C:)',  icon: ICONS.drive },
+    { name: 'CD-ROM (D:)',      icon: ICONS.cdrom },
+    { name: 'My Files',         icon: ICONS.files },
+    { name: 'Control Panel',    icon: ICONS.controlPanel },
+  ];
+
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content">
+      <div class="file-grid">
+        ${drives.map(d => `
+          <div class="file-item" onclick="selectFile(this)" ondblclick="${d.name === 'My Files' ? "openWindow('files')" : d.name === 'Control Panel' ? "openWindow('controlpanel')" : ''}">
+            <img src="${d.icon}" alt="">
+            <span class="file-label">${d.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">${drives.length} object(s)</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+}
+
+function buildControlPanelWindow(container) {
+  const items = [
+    { name: 'Display',        icon: 'img/my-computer.png' },
+    { name: 'Fonts',          icon: 'img/notepad.png' },
+    { name: 'Internet',       icon: 'img/internet-explorer.png' },
+    { name: 'Mouse',          icon: 'img/my-computer.png' },
+    { name: 'Sounds',         icon: 'img/speaker.png' },
+  ];
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content">
+      <div class="file-grid">
+        ${items.map(d => `
+          <div class="file-item" onclick="selectFile(this)">
+            <img src="${d.icon}" alt="">
+            <span class="file-label">${d.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">${items.length} object(s)</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+}
+
+function buildPaintWindow(container) {
+  const COLORS = [
+    '#000000','#808080','#800000','#808000','#008000','#008080','#000080','#800080',
+    '#808040','#004040','#0080ff','#004080','#8000ff','#804000',
+    '#ffffff','#c0c0c0','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff',
+    '#ffff80','#80ff80','#80ffff','#8080ff','#ff80ff','#ff8040',
+  ];
+
+  const TOOLS = [
+    { name:'Free Select',   svg:`<svg viewBox="0 0 16 16"><path d="M8,1C12,1,15,4,15,8C15,12,12,15,8,15C4,15,1,12,1,8C1,4,4,1,8,1Z" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="2,1.5"/></svg>` },
+    { name:'Rect Select',   svg:`<svg viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="3,1.5"/></svg>` },
+    { name:'Eraser',        svg:`<svg viewBox="0 0 16 16"><rect x="1" y="8" width="14" height="7" fill="#ffaaff" stroke="#000" stroke-width="1"/><rect x="1" y="8" width="6" height="7" fill="#ff00ff"/></svg>` },
+    { name:'Fill',          svg:`<svg viewBox="0 0 16 16"><path d="M2,13L2,7L6,3L10,7L8,7L8,13Z" fill="#4040ff" stroke="#000" stroke-width="0.5"/><circle cx="13" cy="13" r="2.5" fill="#ff0000"/><line x1="10" y1="10" x2="12" y2="11" stroke="#000" stroke-width="1"/></svg>` },
+    { name:'Color Picker',  svg:`<svg viewBox="0 0 16 16"><path d="M14,2L15,3L7,11L5,11L5,13L3,15L1,13L3,11L5,11L5,9Z" fill="#000"/></svg>` },
+    { name:'Magnifier',     svg:`<svg viewBox="0 0 16 16"><circle cx="6" cy="6" r="5" fill="none" stroke="#000" stroke-width="2"/><circle cx="6" cy="6" r="2.5" fill="#fff"/><line x1="10" y1="10" x2="15" y2="15" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg>` },
+    { name:'Pencil',        svg:`<svg viewBox="0 0 16 16"><path d="M13,2L15,4L5,14L3,14L3,12Z" fill="#000"/><path d="M3,12L3,14L5,14" fill="none" stroke="#808080" stroke-width="1"/></svg>` },
+    { name:'Brush',         svg:`<svg viewBox="0 0 16 16"><path d="M13,1L15,3L7,11L5,9Z" fill="#804000"/><path d="M5,9L7,11C7,11,6,14,3,14C2,13,2,11,5,9Z" fill="#4080ff"/></svg>` },
+    { name:'Airbrush',      svg:`<svg viewBox="0 0 16 16"><rect x="4" y="6" width="7" height="8" rx="2" fill="#808080" stroke="#000" stroke-width="1"/><rect x="1" y="8" width="4" height="2" fill="#000"/><circle cx="12" cy="3" r="1" fill="#000"/><circle cx="14" cy="6" r="1" fill="#000"/><circle cx="14" cy="1" r="1" fill="#000"/><circle cx="11" cy="1" r="1" fill="#000"/></svg>` },
+    { name:'Text',          svg:`<svg viewBox="0 0 16 16"><text x="2" y="13" font-family="serif" font-size="13" font-weight="bold" fill="#000">A</text></svg>` },
+    { name:'Line',          svg:`<svg viewBox="0 0 16 16"><line x1="2" y1="14" x2="14" y2="2" stroke="#000" stroke-width="2"/></svg>` },
+    { name:'Curve',         svg:`<svg viewBox="0 0 16 16"><path d="M2,14 Q2,2 14,2" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+    { name:'Rectangle',     svg:`<svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+    { name:'Polygon',       svg:`<svg viewBox="0 0 16 16"><polygon points="8,2 14,7 12,14 4,14 2,7" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+    { name:'Ellipse',       svg:`<svg viewBox="0 0 16 16"><ellipse cx="8" cy="8" rx="6" ry="5" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+    { name:'Rounded Rect',  svg:`<svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="3" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+  ];
+
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>I</u>mage</span>
+      <span class="menu-item"><u>O</u>ptions</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="paint-body">
+      <div class="paint-toolbox">
+        <div class="paint-tools">
+          ${TOOLS.map((t, i) => `
+            <button class="paint-tool${i === 6 ? ' active' : ''}" title="${t.name}"
+              onclick="this.closest('.paint-tools').querySelectorAll('.paint-tool').forEach(b=>b.classList.remove('active'));this.classList.add('active')">
+              ${t.svg}
+            </button>`).join('')}
+        </div>
+        <div class="paint-tool-options">
+          ${[1,2,3,4,5].map((w, i) => `
+            <button class="paint-line-opt${i === 0 ? ' active' : ''}" title="${w}px line"
+              onclick="this.closest('.paint-tool-options').querySelectorAll('.paint-line-opt').forEach(b=>b.classList.remove('active'));this.classList.add('active')">
+              <span class="paint-line-preview" style="height:${w}px;"></span>
+            </button>`).join('')}
+        </div>
+      </div>
+      <div class="paint-canvas-wrap">
+        <div class="paint-canvas-inner">
+          <canvas class="paint-canvas" width="400" height="300"></canvas>
+          <div class="paint-canvas-handle paint-handle-r"></div>
+          <div class="paint-canvas-handle paint-handle-b"></div>
+          <div class="paint-canvas-handle paint-handle-br"></div>
+        </div>
+      </div>
+    </div>
+    <div class="paint-palette">
+      <div class="paint-fg-bg">
+        <div class="paint-color-box paint-bg-color"></div>
+        <div class="paint-color-box paint-fg-color"></div>
+      </div>
+      <div class="paint-color-grid">
+        ${COLORS.map(c => `<div class="paint-color-swatch" style="background:${c};" title="${c}"
+          onclick="this.closest('.paint-palette').querySelector('.paint-fg-color').style.background='${c}'"
+          oncontextmenu="event.preventDefault();this.closest('.paint-palette').querySelector('.paint-bg-color').style.background='${c}'"></div>`).join('')}
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item paint-coords" style="min-width:80px;"></span>
+      <span class="status-item">400 x 300</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+
+  container.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;';
+
+  const canvas = container.querySelector('.paint-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    canvas.addEventListener('mousemove', e => {
+      const r = canvas.getBoundingClientRect();
+      const x = Math.round(e.clientX - r.left);
+      const y = Math.round(e.clientY - r.top);
+      const el = container.querySelector('.paint-coords');
+      if (el) el.textContent = `${x}, ${y}`;
+    });
+    canvas.addEventListener('mouseleave', () => {
+      const el = container.querySelector('.paint-coords');
+      if (el) el.textContent = '';
+    });
+  }
+}
+
+function buildRecycleWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;">
+      <!-- Column headers -->
+      <div style="display:flex;flex-shrink:0;background:var(--c-material);">
+        <div style="flex:1;padding:2px 6px;font-size:11px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;border:2px solid;border-top-color:var(--c-border-lightest);border-left-color:var(--c-border-lightest);border-bottom-color:var(--c-border-dark);border-right-color:var(--c-border-dark);cursor:default;">Name</div>
+        <div style="flex:1;padding:2px 6px;font-size:11px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;border:2px solid;border-top-color:var(--c-border-lightest);border-left-color:var(--c-border-lightest);border-bottom-color:var(--c-border-dark);border-right-color:var(--c-border-dark);cursor:default;">Original Location</div>
+      </div>
+      <!-- Empty content area -->
+      <div class="window-content" style="flex:1;overflow:auto;background:#fff;"></div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item">0 object(s)</span>
+      <span class="status-item">0 bytes</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+}
+
+function buildIEWindow(container) {
+  const HOME = 'https://cliowebsites.com';
+
+  const LINKS = [
+    { label: 'Clio Websites', url: 'https://cliowebsites.com' },
+    { label: 'Microsoft',     url: 'https://microsoft.com' },
+  ];
+
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>V</u>iew</span>
+      <span class="menu-item">F<u>a</u>vorites</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+
+    <div class="ie-toolbar">
+      <div class="ie-btn-group">
+        <button class="ie-nav-btn" id="ie-back" title="Back" onclick="ieNav('back')">
+          <svg viewBox="0 0 26 22" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2,11 L11,3 L11,7 L20,7 L20,15 L11,15 L11,19 Z" fill="#303080" stroke="#000" stroke-width="0.5" stroke-linejoin="round"/>
+          </svg>
+          <span>Back</span>
+        </button>
+        <button class="ie-drop-btn" title="Back menu">&#9660;</button>
+      </div>
+      <div class="ie-btn-group">
+        <button class="ie-nav-btn ie-nav-dim" id="ie-forward" title="Forward" onclick="ieNav('forward')">
+          <svg viewBox="0 0 26 22" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24,11 L15,3 L15,7 L6,7 L6,15 L15,15 L15,19 Z" fill="#606060" stroke="#808080" stroke-width="0.5" stroke-linejoin="round"/>
+          </svg>
+          <span>Forward</span>
+        </button>
+        <button class="ie-drop-btn ie-nav-dim" title="Forward menu">&#9660;</button>
+      </div>
+      <div class="ie-toolbar-divider"></div>
+      <button class="ie-nav-btn" id="ie-stop" title="Stop" onclick="ieNav('stop')">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#cc2200" stroke="#880000" stroke-width="1"/>
+          <line x1="7.5" y1="7.5" x2="16.5" y2="16.5" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16.5" y1="7.5" x2="7.5" y2="16.5" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span>Stop</span>
+      </button>
+      <button class="ie-nav-btn" id="ie-refresh" title="Refresh" onclick="ieNav('refresh')">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12,3 A9,9,0,0,1,21,12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M12,21 A9,9,0,0,1,3,12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="12,1 16,6 8,6" fill="#000"/>
+          <polygon points="12,23 8,18 16,18" fill="#000"/>
+        </svg>
+        <span>Refresh</span>
+      </button>
+      <button class="ie-nav-btn" id="ie-home" title="Home" onclick="ieNav('home')">
+        <svg viewBox="0 0 26 24" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="13,2 1,12 4,12 4,22 10,22 10,16 16,16 16,22 22,22 22,12 25,12" fill="#404040" stroke="#000" stroke-width="0.5" stroke-linejoin="round"/>
+          <rect x="10" y="16" width="6" height="6" fill="#808080"/>
+        </svg>
+        <span>Home</span>
+      </button>
+      <button class="ie-nav-btn" id="ie-search" title="Search" onclick="ieLoad('https://google.com')">
+        <svg viewBox="0 0 26 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="8" fill="none" stroke="#000" stroke-width="2.5"/>
+          <line x1="16" y1="16" x2="25" y2="24" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="10" cy="10" r="5" fill="none" stroke="#808080" stroke-width="1"/>
+        </svg>
+        <span>Search</span>
+      </button>
+      <div class="ie-toolbar-sep"></div>
+      <div class="ie-logo">
+        <img src="img/internet-explorer.png" id="ie-logo-img" alt="">
+      </div>
+    </div>
+
+    <div class="ie-addressbar">
+      <span class="ie-address-label">Address</span>
+      <input class="ie-address-input" id="ie-address" type="text" value="${HOME}"
+        onkeydown="if(event.key==='Enter')ieGo()">
+      <button class="ie-go-btn" onclick="ieGo()">Go</button>
+    </div>
+
+    <div class="ie-linksbar">
+      <span class="ie-links-label">Links</span>
+      ${LINKS.map(l => `<button class="ie-link-btn" onclick="ieLoad('${l.url}')">${l.label}</button>`).join('')}
+    </div>
+
+    <div class="ie-content" id="ie-content">
+      <iframe id="ie-frame" src="${HOME}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        onload="ieFrameLoaded(this)" onerror="ieFrameError()"></iframe>
+      <div class="ie-blocked" id="ie-blocked" style="display:none;">
+        <img src="img/internet-explorer.png" style="width:48px;height:48px;image-rendering:pixelated;">
+        <div class="ie-blocked-title">This page cannot be displayed</div>
+        <div class="ie-blocked-msg">The website declined to connect.<br>This is usually caused by security restrictions (X-Frame-Options).</div>
+        <button class="dialog-btn" style="margin-top:12px;" onclick="window.open(document.getElementById('ie-address').value,'_blank')">Open in new tab ↗</button>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span class="status-item" id="ie-status" style="flex:1;">Done</span>
+      <span class="status-item">Internet zone</span>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+
+  container.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;';
+}
+
+function ieNav(action) {
+  const frame = document.getElementById('ie-frame');
+  const addr  = document.getElementById('ie-address');
+  if (!frame) return;
+  if (action === 'back')    { try { frame.contentWindow.history.back();    } catch(e){} }
+  if (action === 'forward') { try { frame.contentWindow.history.forward(); } catch(e){} }
+  if (action === 'stop')    { frame.src = frame.src; }
+  if (action === 'refresh') { try { frame.contentWindow.location.reload(); } catch(e){ frame.src = frame.src; } }
+  if (action === 'home')    { ieLoad('https://cliowebsites.com'); }
+}
+
+function ieLoad(url) {
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const frame   = document.getElementById('ie-frame');
+  const addr    = document.getElementById('ie-address');
+  const blocked = document.getElementById('ie-blocked');
+  const status  = document.getElementById('ie-status');
+  if (addr)    addr.value = url;
+  if (blocked) blocked.style.display = 'none';
+  if (frame)   { frame.style.display = 'block'; frame.src = url; }
+  if (status)  status.textContent = 'Connecting to ' + url + '...';
+}
+
+function ieGo() {
+  const addr = document.getElementById('ie-address');
+  if (addr) ieLoad(addr.value.trim());
+}
+
+function ieFrameLoaded(frame) {
+  const status  = document.getElementById('ie-status');
+  const addr    = document.getElementById('ie-address');
+  const blocked = document.getElementById('ie-blocked');
+  if (status) status.textContent = 'Done';
+  // Try to detect blocked frame (document will be empty/about:blank cross-origin)
+  try {
+    const loc = frame.contentWindow.location.href;
+    if (loc === 'about:blank' && frame.src && frame.src !== 'about:blank') {
+      if (blocked) { blocked.style.display = 'flex'; frame.style.display = 'none'; }
+    }
+  } catch(e) {
+    // Cross-origin — page loaded but we can't read the URL, which is fine
+  }
+}
+
+function ieFrameError() {
+  const blocked = document.getElementById('ie-blocked');
+  const frame   = document.getElementById('ie-frame');
+  if (blocked) { blocked.style.display = 'flex'; }
+  if (frame)   frame.style.display = 'none';
+}
+
+const TIPS = [
+  { text: "To open a program, you just click the Start button, and then click the program's icon." },
+  { text: "You can use Windows Explorer to see all the files on your computer." },
+  { text: "To find a file, click the Start button, point to Find, and then click Files or Folders." },
+  { text: "To adjust the volume, double-click the speaker icon in the taskbar." },
+  { text: "You can drag icons on the desktop to rearrange them however you like." },
+  { text: "Right-click the desktop to change your wallpaper and display settings." },
+];
+let tipIndex = 0;
+
+const MONITOR_SVG = `<svg width="130" height="110" viewBox="0 0 130 110" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Monitor outer body -->
+  <rect x="4" y="4" width="100" height="76" rx="4" fill="#c0c0c0" stroke="#808080" stroke-width="1"/>
+  <rect x="4" y="4" width="100" height="2" fill="#dfdfdf"/>
+  <rect x="4" y="4" width="2" height="76" fill="#dfdfdf"/>
+  <rect x="103" y="4" width="1" height="76" fill="#808080"/>
+  <rect x="4" y="79" width="100" height="1" fill="#808080"/>
+  <!-- Screen bezel (inset) -->
+  <rect x="10" y="10" width="88" height="62" fill="#404040"/>
+  <rect x="10" y="10" width="88" height="1" fill="#606060"/>
+  <rect x="10" y="10" width="1" height="62" fill="#606060"/>
+  <!-- Screen -->
+  <rect x="13" y="13" width="82" height="56" fill="#008080"/>
+  <!-- Taskbar on screen -->
+  <rect x="13" y="60" width="82" height="9" fill="#c0c0c0"/>
+  <!-- Start button on screen -->
+  <rect x="15" y="61" width="18" height="7" fill="#c0c0c0" stroke="#808080" stroke-width="0.5"/>
+  <!-- Cursor arrow (pointing down-left) -->
+  <polygon points="32,20 32,42 37,37 40,44 43,43 40,36 46,36" fill="#00e5e5"/>
+  <polygon points="32,20 32,42 37,37 40,44 43,43 40,36 46,36" fill="none" stroke="#000" stroke-width="0.5"/>
+  <!-- Monitor bottom strip -->
+  <rect x="4" y="80" width="100" height="6" rx="0" fill="#b0b0b0" stroke="#808080" stroke-width="0.5"/>
+  <!-- Power LED -->
+  <rect x="93" y="82" width="4" height="2" fill="#00cc00"/>
+  <!-- Neck -->
+  <rect x="44" y="86" width="20" height="8" fill="#a8a8a8" stroke="#808080" stroke-width="0.5"/>
+  <!-- Base -->
+  <rect x="28" y="94" width="52" height="8" rx="2" fill="#a8a8a8" stroke="#808080" stroke-width="0.5"/>
+  <rect x="28" y="94" width="52" height="1" fill="#c0c0c0"/>
+</svg>`;
+
+function buildWelcomeWindow(container) {
+  container.innerHTML = `
+    <div style="display:flex;flex-direction:column;height:100%;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;background:var(--c-material);">
+
+      <!-- Header: grey background -->
+      <div style="padding:10px 14px 6px;flex-shrink:0;">
+        <span style="font-size:22px;font-weight:normal;color:#000;">Welcome to </span><span style="font-size:22px;font-weight:900;color:#000;-webkit-text-stroke:0.8px #000;">Windows</span><span style="font-size:22px;font-weight:normal;color:#fff;">95</span>
+      </div>
+
+      <!-- Main row: yellow box + buttons -->
+      <div style="display:flex;flex:1;padding:0 8px 8px;gap:8px;align-items:stretch;min-height:0;overflow:hidden;">
+
+        <!-- Yellow sunken box: headshot left, text right -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px;align-items:center;background:#ffff99;border:2px solid;border-top-color:var(--c-border-dark);border-left-color:var(--c-border-dark);border-bottom-color:var(--c-border-lightest);border-right-color:var(--c-border-lightest);box-shadow:inset 1px 1px 0 var(--c-border-darkest);padding:12px;min-height:0;">
+          <div style="width:100%;">
+            <div style="font-size:14px;font-weight:bold;margin-bottom:6px;">Welcome to my Windows 95 portfolio website.</div>
+            <div style="font-size:12px;line-height:1.6;">I decided to vibe code this nostalgic portfolio website with Claude Code. I hope you enjoy it!</div>
+          </div>
+          <img src="img/headshot.png" style="width:140px;height:140px;image-rendering:pixelated;display:block;flex-shrink:0;">
+        </div>
+
+        <!-- Right: buttons -->
+        <div style="display:flex;flex-direction:column;gap:4px;width:130px;flex-shrink:0;">
+          <button class="dialog-btn" style="width:100%;">What's <u>N</u>ew</button>
+          <button class="dialog-btn" style="width:100%;"><u>O</u>nline Registration</button>
+          <div style="flex:1;"></div>
+          <div style="height:1px;background:var(--c-border-dark);margin-bottom:2px;box-shadow:0 1px 0 var(--c-border-lightest);"></div>
+          <div style="height:30px;"></div>
+          <button class="dialog-btn" style="width:100%;" onclick="closeWindow('welcome')"><u>C</u>lose</button>
+        </div>
+
+      </div>
+    </div>
+  `;
+  container.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;';
+}
+
+function buildShutdownWindow(container) {
+  container.innerHTML = `
+    <div style="display:flex;flex:1;gap:14px;padding:14px 16px 0;align-items:flex-start;">
+      <img src="img/shutdown.ico" style="width:41px;height:41px;image-rendering:pixelated;flex-shrink:0;margin-top:2px;">
+      <div style="flex:1;">
+        <p style="margin-bottom:10px;font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;">Are you sure you want to:</p>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;cursor:pointer;">
+            <input type="radio" name="shutdown-opt" value="shutdown" checked style="cursor:pointer;accent-color:#000080;flex-shrink:0;">
+            <span><u>S</u>hut down the computer?</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;cursor:pointer;">
+            <input type="radio" name="shutdown-opt" value="restart" style="cursor:pointer;accent-color:#000080;flex-shrink:0;">
+            <span><u>R</u>estart the computer?</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;cursor:pointer;">
+            <input type="radio" name="shutdown-opt" value="msdos" style="cursor:pointer;accent-color:#000080;flex-shrink:0;">
+            <span>Restart the computer in <u>M</u>S-DOS mode?</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;cursor:pointer;">
+            <input type="radio" name="shutdown-opt" value="logoff" style="cursor:pointer;accent-color:#000080;flex-shrink:0;">
+            <span><u>C</u>lose all programs and log on as a different user?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:8px;padding:4px 14px 12px;">
+      <button class="dialog-btn" onclick="doShutdownAction()"><u>Y</u>es</button>
+      <button class="dialog-btn" onclick="closeWindow('shutdown')"><u>N</u>o</button>
+      <button class="dialog-btn" onclick="closeWindow('shutdown')"><u>H</u>elp</button>
+
+    </div>
+  `;
+  container.style.cssText = 'display:flex;flex-direction:column;';
+}
+
+function buildBioWindow(container) {
+  const s = "font-family:'Fixedsys','Courier New',monospace;font-size:16px;line-height:1.6;color:#000;";
+  const a = 'color:#000080;text-decoration:underline;cursor:pointer;';
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>S</u>earch</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="window-content" style="padding:8px;overflow:auto;">
+      <div style="${s}">
+        <p style="margin-bottom:12px;">Nat Miletic is the founder of <a href="https://cliowebsites.com" target="_blank" style="${a}">Clio Websites</a>, a Calgary web design company. With a BCIS and an MBA under his belt, Nat's all about helping businesses thrive online with his sharp eye for detail and relentless passion for making things better.</p>
+        <p style="margin-bottom:12px;">From crafting sleek WordPress websites to boosting SEO and ensuring everything works smoothly across devices, Nat's helped businesses big and small grow their online presence. Whether it's global brands like MyFitnessPal or local favorites like Galvanic, his work has made websites not only look great but also perform better in search results.</p>
+        <p style="margin-bottom:12px;">Nat's been in the web development and marketing game since the early 2000s, and he loves sharing his insights with thousands of followers on social media.</p>
+        <p style="margin-bottom:12px;">Oh, and did we mention? He's also the author of <a href="https://clientbytes.gumroad.com/l/dev-agency-and-freelancer-sales" target="_blank" style="${a}">Client Bytes – Dev Agency and Freelancer Sales</a> and has created several WordPress and SEO courses available on Gumroad and Udemy. He also co-hosts a podcast called The Agency Hustle with Kyle Prinsloo.</p>
+      </div>
+    </div>
+  `;
+  container.style.cssText = 'display:flex;flex-direction:column;padding-bottom:32px;background:#c6c6c6;';
+}
+
+function buildNotepadWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">Search</span>
+      <span class="menu-item">Help</span>
+    </div>
+    <div class="notepad-edit-row">
+      <textarea class="notepad-ta" wrap="off"></textarea>
+      <div class="notepad-vscroll">
+        <button class="notepad-scroll-btn notepad-scroll-up"></button>
+        <div class="notepad-vtrack">
+          <div class="notepad-vthumb"></div>
+        </div>
+        <button class="notepad-scroll-btn notepad-scroll-down"></button>
+      </div>
+    </div>
+    <div class="status-bar">
+      <span class="status-item notepad-status-item" id="notepad-pos">Ln 1, Col 1</span>
+      <div class="notepad-hscroll">
+        <button class="notepad-scroll-btn notepad-scroll-left"></button>
+        <div class="notepad-htrack">
+          <div class="notepad-hthumb"></div>
+        </div>
+        <button class="notepad-scroll-btn notepad-scroll-right"></button>
+      </div>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
+  const ta     = container.querySelector('.notepad-ta');
+  const htrack = container.querySelector('.notepad-htrack');
+  const hthumb = container.querySelector('.notepad-hthumb');
+  const hleft  = container.querySelector('.notepad-scroll-left');
+  const hright = container.querySelector('.notepad-scroll-right');
+  const vtrack = container.querySelector('.notepad-vtrack');
+  const vthumb = container.querySelector('.notepad-vthumb');
+  const vup    = container.querySelector('.notepad-scroll-up');
+  const vdown  = container.querySelector('.notepad-scroll-down');
+
+  function updateNotepadPos() {
+    const val = ta.value.substring(0, ta.selectionStart);
+    const lines = val.split('\n');
+    const ln  = lines.length;
+    const col = lines[lines.length - 1].length + 1;
+    const el  = document.getElementById('notepad-pos');
+    if (el) el.textContent = `Ln ${ln}, Col ${col}`;
+  }
+
+  function updateHScroll() {
+    const scrollable = ta.scrollWidth - ta.clientWidth;
+    if (scrollable <= 0) { hthumb.style.width = '0'; return; }
+    const trackW  = htrack.clientWidth;
+    const thumbW  = Math.max(20, (ta.clientWidth / ta.scrollWidth) * trackW);
+    const thumbL  = (ta.scrollLeft / scrollable) * (trackW - thumbW);
+    hthumb.style.width = thumbW + 'px';
+    hthumb.style.left  = thumbL + 'px';
+  }
+
+  function updateVScroll() {
+    const scrollable = ta.scrollHeight - ta.clientHeight;
+    if (scrollable <= 0) { vthumb.style.height = '0'; return; }
+    const trackH  = vtrack.clientHeight;
+    const thumbH  = Math.max(20, (ta.clientHeight / ta.scrollHeight) * trackH);
+    const thumbT  = (ta.scrollTop / scrollable) * (trackH - thumbH);
+    vthumb.style.height = thumbH + 'px';
+    vthumb.style.top    = thumbT + 'px';
+  }
+
+  ta.addEventListener('keyup',   updateNotepadPos);
+  ta.addEventListener('click',   updateNotepadPos);
+  ta.addEventListener('scroll',  () => { updateHScroll(); updateVScroll(); });
+  ta.addEventListener('input',   () => { updateHScroll(); updateVScroll(); });
+
+  hleft.addEventListener('click',  () => { ta.scrollLeft -= 20; updateHScroll(); });
+  hright.addEventListener('click', () => { ta.scrollLeft += 20; updateHScroll(); });
+  vup.addEventListener('click',    () => { ta.scrollTop  -= 20; updateVScroll(); });
+  vdown.addEventListener('click',  () => { ta.scrollTop  += 20; updateVScroll(); });
+
+  // H-thumb drag
+  let hDrag = false, hDragX = 0, hScrollL = 0;
+  hthumb.addEventListener('mousedown', e => {
+    hDrag = true; hDragX = e.clientX; hScrollL = ta.scrollLeft; e.preventDefault();
+  });
+
+  // V-thumb drag
+  let vDrag = false, vDragY = 0, vScrollT = 0;
+  vthumb.addEventListener('mousedown', e => {
+    vDrag = true; vDragY = e.clientY; vScrollT = ta.scrollTop; e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (hDrag) {
+      const scrollable = ta.scrollWidth - ta.clientWidth;
+      ta.scrollLeft = hScrollL + (e.clientX - hDragX) * (scrollable / (htrack.clientWidth - hthumb.offsetWidth));
+      updateHScroll();
+    }
+    if (vDrag) {
+      const scrollable = ta.scrollHeight - ta.clientHeight;
+      ta.scrollTop = vScrollT + (e.clientY - vDragY) * (scrollable / (vtrack.clientHeight - vthumb.offsetHeight));
+      updateVScroll();
+    }
+  });
+  document.addEventListener('mouseup', () => { hDrag = false; vDrag = false; });
+
+  // Mouse wheel scrolling
+  ta.addEventListener('wheel', e => {
+    e.preventDefault();
+    ta.scrollTop += e.deltaY;
+    updateVScroll();
+  }, { passive: false });
+
+  setTimeout(() => { updateHScroll(); updateVScroll(); }, 50);
+}
+
+// ════════════════════════════════
+//  WINDOW DEFINITIONS
+// ════════════════════════════════
+const WINDOW_DEFS = {
+  computer: {
+    title: 'My Computer',
+    width: 500, height: 360,
+    icon: 'computer',
+    build: buildComputerWindow,
+  },
+  files: {
+    title: 'My Files',
+    width: 520, height: 380,
+    icon: 'files',
+    build: buildFilesWindow,
+  },
+  recycle: {
+    title: 'Recycle Bin',
+    width: 380, height: 300,
+    icon: 'recycle',
+    build: buildRecycleWindow,
+  },
+  ie: {
+    title: 'Internet Explorer',
+    width: 800, height: 580,
+    icon: 'ie',
+    build: buildIEWindow,
+  },
+  welcome: {
+    title: 'Welcome',
+    width: 480, height: 380,
+    icon: 'welcome',
+    noIcon: true,
+    noResize: true,
+    build: buildWelcomeWindow,
+  },
+  shutdown: {
+    title: 'Shut Down Windows',
+    width: 374, height: 240,
+    icon: 'shutdown',
+    noIcon: true,
+    noResize: true,
+    build: buildShutdownWindow,
+  },
+  notepad: {
+    title: 'Notepad - Untitled',
+    width: 430, height: 320,
+    icon: 'notepad',
+    build: buildNotepadWindow,
+  },
+  bio: {
+    title: 'Notepad - Nat Miletic Bio',
+    width: 520, height: 420,
+    icon: 'notepad',
+    build: buildBioWindow,
+  },
+  controlpanel: {
+    title: 'Control Panel',
+    width: 500, height: 360,
+    icon: 'controlPanel',
+    build: buildControlPanelWindow,
+  },
+  documents: {
+    title: 'Documents',
+    width: 420, height: 320,
+    icon: 'files',
+    build: buildDocumentsWindow,
+  },
+  photos: {
+    title: 'Photos',
+    width: 420, height: 320,
+    icon: 'files',
+    build: buildPhotosWindow,
+  },
+  paint: {
+    title: 'Untitled - Paint',
+    width: 590, height: 500,
+    icon: 'paint',
+    build: buildPaintWindow,
+  },
+};
