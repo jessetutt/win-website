@@ -244,6 +244,17 @@
 .start-submenu-item .item-text { flex: 1; }
 
 /* ════════════════════════════════
+   MOBILE: suppress iOS sticky-hover submenus
+   (iOS fires :hover on tap, which would show the desktop flyout
+   alongside the panel — force them hidden on mobile always)
+   ════════════════════════════════ */
+@media (max-width: 768px) {
+  .has-submenu > .start-submenu {
+    display: none !important;
+  }
+}
+
+/* ════════════════════════════════
    MOBILE DRILL-DOWN PANEL
    Overlays the start menu when a submenu is tapped on mobile.
    Controlled entirely via JS (classList.add/remove 'visible').
