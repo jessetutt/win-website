@@ -5,7 +5,7 @@ function buildFilesWindow(container) {
   const files = [
     { name: 'Documents', icon: ICONS.files },
     { name: 'Photos',    icon: ICONS.files },
-    { name: 'Nat Miletic Bio', icon: ICONS.notepad },
+    { name: 'Nat Miletic Bio', icon: ICONS.textFile },
   ];
 
   container.innerHTML = `
