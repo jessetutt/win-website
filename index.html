@@ -181,6 +181,11 @@
       <span class="item-text">Welcome</span>
     </div>
 
+    <div class="start-menu-item" onclick="openWindow('run');closeStartMenu()">
+      <img src="img/run.ico" alt="" style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0;">
+      <span class="item-text">Run...</span>
+    </div>
+
     <div class="start-menu-sep"></div>
 
     <div class="start-menu-item" onclick="showShutdown();closeStartMenu()">
@@ -195,10 +200,12 @@
      CONTEXT MENU
      ════════════════════════════════ -->
 <div id="context-menu">
-  <div class="context-item grayed">Arrange Icons</div>
-  <div class="context-item grayed">Line Up Icons</div>
+  <div class="context-item grayed"><u>A</u>rrange Icons</div>
+  <div class="context-item grayed"><u>L</u>ine Up Icons</div>
   <div class="context-sep"></div>
-  <div class="context-item" onclick="hideContextMenu()">Refresh</div>
+  <div class="context-item" onclick="hideContextMenu()"><u>R</u>efresh</div>
+  <div class="context-sep"></div>
+  <div class="context-item grayed"><u>P</u>roperties</div>
 </div>
 
 

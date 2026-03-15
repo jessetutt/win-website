@@ -44,6 +44,8 @@
   flex: 1;
   resize: none;
   overflow: hidden;
+  user-select: text;
+  -webkit-user-select: text;
   border: 2px solid;
   border-top-color: var(--c-border-dark);
   border-left-color: var(--c-border-dark);
@@ -57,6 +59,11 @@
   outline: none;
   line-height: 1.4;
   color: #000;
+}
+.notepad-ta::selection,
+.notepad-ta *::selection {
+  background: #000080;
+  color: #fff;
 }
 .notepad-hscroll {
   flex: 1;

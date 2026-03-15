@@ -29,6 +29,8 @@ const ICONS = {
 
   textFile: `img/notepad.png`,
 
+  run: `img/run.ico`,
+
   welcome: `img/welcome.png`,
 
   shutdown: `img/shutdown.ico`,

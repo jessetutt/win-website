@@ -220,7 +220,6 @@
   cursor: default;
   width: 110px;
 }
-.file-item:hover .file-label,
 .file-item.selected .file-label {
   background-color: #000080;
   color: #fff;

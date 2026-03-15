@@ -555,7 +555,7 @@ function buildBioWindow(container) {
     <div class="notepad-edit-row">
       <div class="notepad-ta" style="overflow:hidden;display:block;white-space:normal;cursor:default;">
         <div style="${s}">
-          <p style="margin-bottom:12px;">Nat Miletic is the founder of <a href="https://cliowebsites.com" target="_blank" style="${a}">Clio Websites</a>, a Calgary web design company. With a BCIS and an MBA under his belt, Nat's all about helping businesses thrive online with his sharp eye for detail and relentless passion for making things better.</p>
+          <p style="margin-bottom:12px;">Nat Miletic is the founder of <a href="https://cliowebsites.com" target="_blank" style="${a}">Clio Websites</a> and co-founder of <a href="https://websitesusa.com" target="_blank" style="${a}">Websites USA</a>. With a BCIS and an MBA under his belt, Nat's all about helping businesses thrive online with his sharp eye for detail and relentless passion for making things better.</p>
           <p style="margin-bottom:12px;">From crafting sleek WordPress websites to boosting SEO and ensuring everything works smoothly across devices, Nat's helped businesses big and small grow their online presence. Whether it's global brands like MyFitnessPal or local favorites like Galvanic, his work has made websites not only look great but also perform better in search results.</p>
           <p style="margin-bottom:12px;">Nat's been in the web development and marketing game since the early 2000s, and he loves sharing his insights with thousands of followers on social media.</p>
           <p style="margin-bottom:12px;">Oh, and did we mention? He's also the author of <a href="https://clientbytes.gumroad.com/l/dev-agency-and-freelancer-sales" target="_blank" style="${a}">Client Bytes – Dev Agency and Freelancer Sales</a> and has created several WordPress and SEO courses available on Gumroad and Udemy. He also co-hosts a podcast called The Agency Hustle with Kyle Prinsloo.</p>
@@ -760,6 +760,46 @@ function buildNotepadWindow(container) {
   setTimeout(() => { updateHScroll(); updateVScroll(); }, 50);
 }
 
+function buildRunWindow(container) {
+  const f = "font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;";
+  const inputStyle = `
+    flex:1;height:22px;${f}
+    padding:0 3px;
+    border:2px solid;
+    border-top-color:var(--c-border-dark);border-left-color:var(--c-border-dark);
+    border-bottom-color:var(--c-border-lightest);border-right-color:var(--c-border-lightest);
+    box-shadow:inset 1px 1px 0 var(--c-border-darkest);
+    background:#fff;outline:none;
+  `;
+  const dropBtnStyle = `
+    width:22px;height:22px;flex-shrink:0;
+    background:var(--c-material);cursor:pointer;border:2px solid;
+    border-top-color:var(--c-border-lightest);border-left-color:var(--c-border-lightest);
+    border-bottom-color:var(--c-border-darkest);border-right-color:var(--c-border-darkest);
+    box-shadow:var(--shadow-btn);
+    display:flex;align-items:center;justify-content:center;${f}
+  `;
+  container.innerHTML = `
+    <div style="display:flex;gap:12px;padding:14px 14px 10px;align-items:flex-start;">
+      <img src="img/run.ico" style="width:38px;height:38px;image-rendering:pixelated;flex-shrink:0;margin-top:2px;">
+      <p style="${f}line-height:1.5;">Type the name of a program, folder, or document, and Windows will open it for you.</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:0 14px 12px;">
+      <label style="${f}white-space:nowrap;">Open:</label>
+      <div style="display:flex;flex:1;">
+        <input type="text" style="${inputStyle}">
+        <button style="${dropBtnStyle}">&#9660;</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;padding:0 14px 14px;">
+      <button class="dialog-btn"><u>O</u>K</button>
+      <button class="dialog-btn" onclick="closeWindow('run')"><u>C</u>ancel</button>
+      <button class="dialog-btn"><u>B</u>rowse...</button>
+    </div>
+  `;
+  container.style.cssText = 'display:flex;flex-direction:column;';
+}
+
 // ════════════════════════════════
 //  WINDOW DEFINITIONS
 // ════════════════════════════════
@@ -839,5 +879,12 @@ const WINDOW_DEFS = {
     width: 590, height: 500,
     icon: 'paint',
     build: buildPaintWindow,
+  },
+  run: {
+    title: 'Run',
+    width: 360, height: 170,
+    icon: 'run',
+    noResize: true,
+    build: buildRunWindow,
   },
 };

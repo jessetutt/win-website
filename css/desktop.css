@@ -17,7 +17,6 @@
   cursor: default;
   padding: 4px;
 }
-.desktop-icon:hover .icon-label,
 .desktop-icon.selected .icon-label {
   background-color: #000080;
   color: #fff;
