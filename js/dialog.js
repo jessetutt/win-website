@@ -18,14 +18,28 @@ function hideDialog() {
 }
 function doLogoff() {
   document.body.innerHTML = `
-    <div style="background:#008080;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
-      <p style="color:#fff;font-family:'MS Sans Serif',Arial,sans-serif;font-size:16px;text-align:center;">
-        Please wait while Windows logs you off...
-      </p>
-      <button onclick="location.reload()" style="padding:6px 24px;font-size:12px;cursor:pointer;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:0 0 0 1px #000;font-family:'MS Sans Serif',Arial,sans-serif;">
-        Log on again
-      </button>
+    <div style="background:#008080;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;">
+      <div style="background:#c0c0c0;box-shadow:inset -1px -1px 0 #0a0a0a,inset 1px 1px 0 #dfdfdf,inset -2px -2px 0 #848584,inset 2px 2px 0 #fefefe;width:320px;padding:3px;">
+        <div style="background:linear-gradient(to right,#000080,#1084d0);color:#fff;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;font-size:13px;font-weight:bold;padding:3px 5px;display:flex;align-items:center;gap:6px;height:22px;margin-bottom:2px;">
+          <img src="img/win95-logo.png" style="width:16px;height:16px;image-rendering:pixelated;flex-shrink:0;">
+          Log in to Windows
+        </div>
+        <div style="padding:12px 12px 8px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;font-size:13px;width:90px;flex-shrink:0;">User name:</label>
+            <input id="login-user" type="text" value="Nat" style="flex:1;height:20px;border:none;box-shadow:inset -1px -1px 0 #dfdfdf,inset 1px 1px 0 #848584,inset -2px -2px 0 #fefefe,inset 2px 2px 0 #0a0a0a;padding:0 3px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;font-size:13px;background:#fff;outline:none;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;font-size:13px;width:90px;flex-shrink:0;">Password:</label>
+            <input id="login-pass" type="password" style="flex:1;height:20px;border:none;box-shadow:inset -1px -1px 0 #dfdfdf,inset 1px 1px 0 #848584,inset -2px -2px 0 #fefefe,inset 2px 2px 0 #0a0a0a;padding:0 3px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;font-size:13px;background:#fff;outline:none;">
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;padding:0 12px 12px;">
+          <button onclick="location.reload()" style="min-width:75px;height:23px;background:#c0c0c0;box-shadow:inset -1px -1px 0 #0a0a0a,inset 1px 1px 0 #fefefe,inset -2px -2px 0 #848584,inset 2px 2px 0 #dfdfdf;border:none;cursor:pointer;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;font-size:13px;color:#000;">OK</button>
+        </div>
+      </div>
     </div>`;
+  setTimeout(() => { const u = document.getElementById('login-user'); if (u) { u.focus(); u.select(); } }, 50);
 }
 
 function doShutdownAction() {
