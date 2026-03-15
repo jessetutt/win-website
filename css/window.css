@@ -93,7 +93,7 @@
 .win-btn:active svg {
   transform: translate(1px, 1px);
 }
-.win-btn-close { width: 22px; }
+.win-btn-close { width: 22px; margin-left: 2px; }
 .win-btn-minimize {
   background-image: url('../img/minimize-btn.png');
   background-size: 100% 100%;

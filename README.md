@@ -50,6 +50,10 @@ This project draws inspiration and references from several excellent open-source
 
 - **[Windows 95 App Icons by Wallpapers Clan](https://wallpapers-clan.com)** — retro-styled app icons including the LinkedIn desktop icon.
 
+- **[Windows 95 UI Kit (Figma)](https://www.figma.com/community/file/1214528480728795592)** — comprehensive Figma component library for Windows 95 UI elements, referenced for title bar layout, button specs, and control measurements.
+
+- **[Windows 95 Icons (Figma)](https://www.figma.com/community/file/1254078490904184073)** — pixel-accurate Windows 95 icon assets from the Figma Community, used as reference for icon design and sizing.
+
 ---
 
 ## Author

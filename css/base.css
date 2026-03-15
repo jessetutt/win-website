@@ -42,6 +42,12 @@
   50%       { opacity: 0; }
 }
 
+/* ── iOS WebKit text color fix ── */
+/* Prevents iOS Safari from overriding color with its default blue on interactive elements */
+* {
+  -webkit-text-fill-color: currentColor;
+}
+
 /* ── Base ── */
 body {
   font-family: "w95fa", 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif;

@@ -718,54 +718,25 @@ function buildNotepadWindow(container) {
       <span class="menu-item"><u>H</u>elp</span>
     </div>
     <div class="notepad-edit-row">
-      <textarea class="notepad-ta" wrap="off"></textarea>
+      <textarea class="notepad-ta"></textarea>
       <div class="notepad-vscroll">
         <button class="notepad-scroll-btn notepad-scroll-up"></button>
         <div class="notepad-vtrack">
           <div class="notepad-vthumb"></div>
         </div>
         <button class="notepad-scroll-btn notepad-scroll-down"></button>
+        <div style="width:16px;height:16px;flex-shrink:0;background:#c0c0c0;"></div>
       </div>
-    </div>
-    <div class="status-bar">
-      <div class="notepad-hscroll">
-        <button class="notepad-scroll-btn notepad-scroll-left"></button>
-        <div class="notepad-htrack">
-          <div class="notepad-hthumb"></div>
-        </div>
-        <button class="notepad-scroll-btn notepad-scroll-right"></button>
-      </div>
-      <div class="status-resize-slot"></div>
     </div>
   `;
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
 
   const ta     = container.querySelector('.notepad-ta');
-  const htrack = container.querySelector('.notepad-htrack');
-  const hthumb = container.querySelector('.notepad-hthumb');
-  const hleft  = container.querySelector('.notepad-scroll-left');
-  const hright = container.querySelector('.notepad-scroll-right');
   const vtrack = container.querySelector('.notepad-vtrack');
   const vthumb = container.querySelector('.notepad-vthumb');
   const vup    = container.querySelector('.notepad-scroll-up');
   const vdown  = container.querySelector('.notepad-scroll-down');
-
-
-  function updateHScroll() {
-    const scrollable = ta.scrollWidth - ta.clientWidth;
-    const disabled = scrollable <= 0;
-    hleft.classList.toggle('scroll-disabled', disabled);
-    hright.classList.toggle('scroll-disabled', disabled);
-    htrack.classList.toggle('scroll-disabled', disabled);
-    if (disabled) { hthumb.style.display = 'none'; return; }
-    hthumb.style.display = '';
-    const trackW  = htrack.clientWidth;
-    const thumbW  = Math.max(20, (ta.clientWidth / ta.scrollWidth) * trackW);
-    const thumbL  = (ta.scrollLeft / scrollable) * (trackW - thumbW);
-    hthumb.style.width = thumbW + 'px';
-    hthumb.style.left  = thumbL + 'px';
-  }
 
   function updateVScroll() {
     const scrollable = ta.scrollHeight - ta.clientHeight;
@@ -782,48 +753,33 @@ function buildNotepadWindow(container) {
     vthumb.style.top    = thumbT + 'px';
   }
 
-  ta.addEventListener('scroll',  () => { updateHScroll(); updateVScroll(); });
-  ta.addEventListener('input',   () => { updateHScroll(); updateVScroll(); });
+  ta.addEventListener('scroll', () => { updateVScroll(); });
+  ta.addEventListener('input',  () => { updateVScroll(); });
 
-  hleft.addEventListener('click',  () => { ta.scrollLeft -= 20; updateHScroll(); });
-  hright.addEventListener('click', () => { ta.scrollLeft += 20; updateHScroll(); });
-  vup.addEventListener('click',    () => { ta.scrollTop  -= 20; updateVScroll(); });
-  vdown.addEventListener('click',  () => { ta.scrollTop  += 20; updateVScroll(); });
+  vup.addEventListener('click',  () => { ta.scrollTop -= 20; updateVScroll(); });
+  vdown.addEventListener('click', () => { ta.scrollTop += 20; updateVScroll(); });
 
-  // H-thumb drag
-  let hDrag = false, hDragX = 0, hScrollL = 0;
-  hthumb.addEventListener('mousedown', e => {
-    hDrag = true; hDragX = e.clientX; hScrollL = ta.scrollLeft; e.preventDefault();
-  });
-
-  // V-thumb drag
   let vDrag = false, vDragY = 0, vScrollT = 0;
   vthumb.addEventListener('mousedown', e => {
     vDrag = true; vDragY = e.clientY; vScrollT = ta.scrollTop; e.preventDefault();
   });
 
   document.addEventListener('mousemove', e => {
-    if (hDrag) {
-      const scrollable = ta.scrollWidth - ta.clientWidth;
-      ta.scrollLeft = hScrollL + (e.clientX - hDragX) * (scrollable / (htrack.clientWidth - hthumb.offsetWidth));
-      updateHScroll();
-    }
     if (vDrag) {
       const scrollable = ta.scrollHeight - ta.clientHeight;
       ta.scrollTop = vScrollT + (e.clientY - vDragY) * (scrollable / (vtrack.clientHeight - vthumb.offsetHeight));
       updateVScroll();
     }
   });
-  document.addEventListener('mouseup', () => { hDrag = false; vDrag = false; });
+  document.addEventListener('mouseup', () => { vDrag = false; });
 
-  // Mouse wheel scrolling
   ta.addEventListener('wheel', e => {
     e.preventDefault();
     ta.scrollTop += e.deltaY;
     updateVScroll();
   }, { passive: false });
 
-  setTimeout(() => { updateHScroll(); updateVScroll(); }, 50);
+  setTimeout(() => { updateVScroll(); }, 50);
 }
 
 function buildRunWindow(container) {
@@ -1111,6 +1067,228 @@ function mineSetFace(f) {
 function mineFacePress() { mineSetFace('🙂'); }
 
 // ════════════════════════════════
+//  DISK DEFRAGMENTER
+// ════════════════════════════════
+function buildDefragWindow(container, type) {
+  const BW = 9, BH = 7, GAP = 1;
+  const CW = BW + GAP, CH = BH + GAP; // cell stride: 10w × 8h
+  const ROWS_MAX = 150;               // total rows for ~15 min run
+  const INTERVAL_MS = 100;            // ms per block → 150×COLS×100ms ≈ 15 min
+
+  const USED = 0, SYS = 1, FRAG = 2, FREE = 3, HEAD = 4;
+  const PAL = [
+    ['#00A8A8', '#50DDDD', '#006868'], // USED  – cyan
+    ['#0000A8', '#2828C8', '#000060'], // SYS   – navy
+    ['#A80000', '#DD5050', '#580000'], // FRAG  – red
+    ['#C0C0C0', '#FFFFFF', '#808080'], // FREE  – silver
+  ];
+
+  const cvId   = `dfcv-${type}`;
+  const vpId   = `dfvp-${type}`;
+  const fillId = `dffill-${type}`;
+  const pctId  = `dfpct-${type}`;
+
+  container.innerHTML = `
+    <div class="defrag-body">
+      <div class="defrag-scroll-row">
+        <div class="defrag-viewport" id="${vpId}">
+          <canvas id="${cvId}" style="position:absolute;top:0;left:0;image-rendering:pixelated;image-rendering:crisp-edges;"></canvas>
+        </div>
+        <div class="notepad-vscroll">
+          <button class="notepad-scroll-btn notepad-scroll-up"></button>
+          <div class="notepad-vtrack"><div class="notepad-vthumb"></div></div>
+          <button class="notepad-scroll-btn notepad-scroll-down"></button>
+          <div style="width:16px;height:16px;flex-shrink:0;background:#c0c0c0;"></div>
+        </div>
+      </div>
+      <div class="defrag-controls">
+        <div class="defrag-info">
+          <div class="defrag-status-txt">Defragmenting file system...</div>
+          <div class="defrag-bar-track">
+            <div class="defrag-bar-fill" id="${fillId}"></div>
+          </div>
+          <div class="defrag-pct" id="${pctId}">0% Complete</div>
+        </div>
+        <div class="defrag-btns">
+          <button class="dialog-btn" style="width:90px"><u>S</u>top</button>
+          <button class="dialog-btn" style="width:90px"><u>P</u>ause</button>
+          <button class="dialog-btn" style="width:90px">Legend</button>
+          <button class="dialog-btn" style="width:90px">Hide Details</button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
+  const vp     = document.getElementById(vpId);
+  const cv     = document.getElementById(cvId);
+  const ctx    = cv.getContext('2d');
+  const fillEl = document.getElementById(fillId);
+  const pctEl  = document.getElementById(pctId);
+  const vtrack = container.querySelector('.notepad-vtrack');
+  const vthumb = container.querySelector('.notepad-vthumb');
+  const vup    = container.querySelector('.notepad-scroll-up');
+  const vdown  = container.querySelector('.notepad-scroll-down');
+
+  let COLS = 0, ROWS_INITIAL = 0;
+  let grid, currentRows, headPos, scrollOffset;
+  let lastTs = 0;
+
+  function initGrid(cols) {
+    grid = new Uint8Array(ROWS_MAX * cols);
+    for (let r = 0; r < ROWS_MAX; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c, rnd = Math.random();
+        if      (r < 2)                  grid[i] = SYS;
+        else if (r === 2)                grid[i] = rnd < 0.65 ? SYS  : (rnd < 0.82 ? USED : FRAG);
+        else if (r >= 6  && r <= 9)      grid[i] = rnd < 0.55 ? FRAG : (rnd < 0.72 ? FREE : USED);
+        else if (r >= 10 && r <= 12)     grid[i] = rnd < 0.35 ? FRAG : (rnd < 0.48 ? FREE : USED);
+        else                             grid[i] = rnd < 0.04 ? FRAG : (rnd < 0.07 ? FREE : USED);
+      }
+    }
+  }
+
+  function drawBlock(i) {
+    const r = (i / COLS) | 0, c = i % COLS;
+    const x = c * CW, y = r * CH;
+    const t = grid[i];
+    if (t === HEAD) { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, BW, BH); return; }
+    const [fill, hi, sh] = PAL[t];
+    ctx.fillStyle = fill; ctx.fillRect(x + 1, y + 1, BW - 1, BH - 1);
+    ctx.fillStyle = hi;   ctx.fillRect(x, y, BW - 1, 1); ctx.fillRect(x, y + 1, 1, BH - 1);
+    ctx.fillStyle = sh;   ctx.fillRect(x + 1, y + BH - 1, BW - 1, 1); ctx.fillRect(x + BW - 1, y + 1, 1, BH - 1);
+  }
+
+  function drawRowRange(r0, r1) {
+    for (let r = r0; r < r1; r++)
+      for (let c = 0; c < COLS; c++) drawBlock(r * COLS + c);
+  }
+
+  // ── Scrollbar ──────────────────────────────
+  function updateScrollbar() {
+    const vpH = vp.clientHeight;
+    const canH = currentRows * CH;
+    const scrollable = Math.max(0, canH - vpH);
+    scrollOffset = Math.max(0, Math.min(scrollOffset, scrollable));
+    cv.style.top = -scrollOffset + 'px';
+    vup.classList.toggle('scroll-disabled', scrollOffset <= 0);
+    vdown.classList.toggle('scroll-disabled', scrollOffset >= scrollable);
+    vtrack.classList.toggle('scroll-disabled', scrollable <= 0);
+    if (scrollable <= 0) { vthumb.style.display = 'none'; return; }
+    vthumb.style.display = '';
+    const trackH = vtrack.clientHeight;
+    const thumbH = Math.max(20, (vpH / canH) * trackH);
+    const thumbT = (scrollOffset / scrollable) * (trackH - thumbH);
+    vthumb.style.height = thumbH + 'px';
+    vthumb.style.top    = thumbT + 'px';
+  }
+
+  function autoScroll() {
+    const scrollable = Math.max(0, currentRows * CH - vp.clientHeight);
+    if (scrollable > 0 && scrollOffset >= scrollable - CH * 3) {
+      scrollOffset = scrollable;
+      updateScrollbar();
+    }
+  }
+
+  vup.addEventListener('click',   () => { scrollOffset -= CH * 3; updateScrollbar(); });
+  vdown.addEventListener('click', () => { scrollOffset += CH * 3; updateScrollbar(); });
+
+  let vDrag = false, vDragY = 0, vScrollStart = 0;
+  vthumb.addEventListener('mousedown', e => {
+    vDrag = true; vDragY = e.clientY; vScrollStart = scrollOffset; e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!vDrag) return;
+    const canH = currentRows * CH, vpH = vp.clientHeight;
+    const scrollable = Math.max(0, canH - vpH);
+    const trackH = vtrack.clientHeight;
+    const thumbH = Math.max(20, (vpH / canH) * trackH);
+    scrollOffset = vScrollStart + (e.clientY - vDragY) * scrollable / (trackH - thumbH);
+    updateScrollbar();
+  });
+  document.addEventListener('mouseup', () => { vDrag = false; });
+
+  // ── Progress bar (whole blocks only) ───────
+  function updateProgress() {
+    const pct = Math.min(100, Math.floor(headPos / (ROWS_MAX * COLS) * 100));
+    const trackW = fillEl.parentElement.clientWidth - 4; // 2px padding each side
+    const maxBlks = Math.floor(trackW / 10);
+    fillEl.style.width = (Math.floor(pct / 100 * maxBlks) * 10) + 'px';
+    pctEl.textContent = pct + '% Complete';
+  }
+
+  // ── Animation tick ──────────────────────────
+  function tick(ts) {
+    if (!document.getElementById(cvId)) return; // window closed
+    if (ts - lastTs < INTERVAL_MS) { requestAnimationFrame(tick); return; }
+    lastTs = ts;
+
+    // Reveal rows one-at-a-time as head progresses
+    const targetRows = Math.min(ROWS_MAX, ROWS_INITIAL + Math.floor(headPos / COLS));
+    if (targetRows > currentRows) {
+      drawRowRange(currentRows, targetRows);
+      currentRows = targetRows;
+      autoScroll();
+      updateScrollbar();
+    }
+
+    if (headPos >= ROWS_MAX * COLS) {
+      // Full pass complete — restart
+      initGrid(COLS);
+      currentRows = ROWS_INITIAL;
+      headPos = 0;
+      scrollOffset = 0;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, cv.width, cv.height);
+      drawRowRange(0, currentRows);
+      updateScrollbar();
+      updateProgress();
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    // Clear previous head position
+    if (headPos > 0 && grid[headPos - 1] === HEAD) {
+      grid[headPos - 1] = USED;
+      drawBlock(headPos - 1);
+    }
+    // Paint current head
+    if (grid[headPos] !== SYS) {
+      grid[headPos] = HEAD;
+      drawBlock(headPos);
+    }
+    headPos++;
+
+    updateProgress();
+    requestAnimationFrame(tick);
+  }
+
+  // ── Init after layout renders ───────────────
+  setTimeout(() => {
+    COLS         = Math.max(10, Math.floor(vp.clientWidth / CW));
+    ROWS_INITIAL = Math.max(5, Math.floor(vp.clientHeight / CH));
+
+    cv.width  = COLS * CW;
+    cv.height = ROWS_MAX * CH; // pre-allocate full height
+
+    initGrid(COLS);
+    currentRows  = ROWS_INITIAL;
+    headPos      = 0;
+    scrollOffset = 0;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    drawRowRange(0, currentRows);
+    updateScrollbar();
+    updateProgress();
+
+    requestAnimationFrame(tick);
+  }, 50);
+}
+
+// ════════════════════════════════
 const WINDOW_DEFS = {
   computer: {
     title: 'My Computer',
@@ -1208,5 +1386,12 @@ const WINDOW_DEFS = {
     width: 420, height: 320,
     icon: 'briefcase',
     build: buildBriefcaseWindow,
+  },
+  defrag: {
+    title: 'Defragmenting Drive C',
+    width: 660, height: 510,
+    icon: 'defrag',
+    noResize: true,
+    build: buildDefragWindow,
   },
 };

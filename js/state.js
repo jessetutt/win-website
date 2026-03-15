@@ -42,5 +42,7 @@ const ICONS = {
   minesweeper: `img/minesweeper.png`,
 
   briefcase: `img/briefcase.png`,
+
+  defrag: `img/defrag.png`,
 };
 
