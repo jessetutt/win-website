@@ -1098,7 +1098,6 @@ function buildDefragWindow(container, type) {
           <button class="notepad-scroll-btn notepad-scroll-up"></button>
           <div class="notepad-vtrack"><div class="notepad-vthumb"></div></div>
           <button class="notepad-scroll-btn notepad-scroll-down"></button>
-          <div style="width:16px;height:16px;flex-shrink:0;background:#c0c0c0;"></div>
         </div>
       </div>
       <div class="defrag-controls">

@@ -515,6 +515,7 @@
   flex: 1;
   overflow: hidden;
   position: relative;
+  background: #000;
 }
 .defrag-controls {
   display: flex;
