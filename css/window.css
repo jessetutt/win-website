@@ -46,6 +46,7 @@
 }
 .window-title {
   color: #fff;
+  -webkit-text-fill-color: #fff;
   font-size: 18px;
   font-weight: normal;
   font-family: "w95fa", 'MS Sans Serif', Tahoma, sans-serif;

@@ -73,6 +73,7 @@
   text-align: left;
   font-size: 13px;
   color: #000000;
+  -webkit-text-fill-color: #000000;
 }
 .taskbar-btn.active {
   box-shadow: var(--shadow-btn-active);
