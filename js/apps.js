@@ -1292,6 +1292,7 @@ function buildDefragWindow(container, type) {
     COLS         = Math.max(10, Math.floor(vp.clientWidth / CW));
     ROWS_INITIAL = Math.max(5, Math.floor(vp.clientHeight / CH));
 
+    vp.style.background = '#000'; // switch from white holding screen to black
     cv.width  = vp.clientWidth; // exact viewport width — no black gap on right
     cv.height = ROWS_MAX * CH;  // pre-allocate full height
 
@@ -1316,7 +1317,7 @@ function buildDefragWindow(container, type) {
     }, 100);
 
     requestAnimationFrame(tick);
-  }, 60000);
+  }, 1000);
 }
 
 // ════════════════════════════════
