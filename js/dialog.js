@@ -19,7 +19,7 @@ function hideDialog() {
 function doLogoff() {
   const F = "'w95fa','MS Sans Serif',Tahoma,sans-serif";
   const btn = `min-width:72px;height:23px;background:#c0c0c0;box-shadow:inset -1px -1px 0 #0a0a0a,inset 1px 1px 0 #fefefe,inset -2px -2px 0 #848584,inset 2px 2px 0 #dfdfdf;border:none;cursor:pointer;font-family:${F};font-size:13px;color:#000;`;
-  const field = `flex:1;height:20px;border:none;box-shadow:inset -1px -1px 0 #dfdfdf,inset 1px 1px 0 #848584,inset -2px -2px 0 #fefefe,inset 2px 2px 0 #0a0a0a;padding:0 3px;font-family:${F};font-size:13px;background:#fff;outline:none;`;
+  const field = `flex:1;height:18px;border:none;box-shadow:inset -1px -1px 0 #dfdfdf,inset 1px 1px 0 #848584,inset -2px -2px 0 #fefefe,inset 2px 2px 0 #0a0a0a;padding:0 3px;font-family:${F};font-size:13px;background:#fff;outline:none;`;
   document.body.innerHTML = `
     <div style="background:#008080;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;">
       <div style="background:#c0c0c0;box-shadow:inset -1px -1px 0 #0a0a0a,inset 1px 1px 0 #dfdfdf,inset -2px -2px 0 #848584,inset 2px 2px 0 #fefefe;width:440px;padding:3px;">
@@ -33,11 +33,11 @@ function doLogoff() {
           <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
             <p style="margin:0 0 8px;font-family:${F};font-size:13px;">Type a user name and password to log on to Windows.</p>
             <div style="display:flex;align-items:center;gap:8px;">
-              <label style="font-family:${F};font-size:13px;width:86px;flex-shrink:0;">User name:</label>
+              <label style="font-family:${F};font-size:13px;width:86px;flex-shrink:0;"><u>U</u>ser name:</label>
               <input id="login-user" type="text" value="Nat" style="${field}">
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <label style="font-family:${F};font-size:13px;width:86px;flex-shrink:0;">Password:</label>
+              <label style="font-family:${F};font-size:13px;width:86px;flex-shrink:0;"><u>P</u>assword:</label>
               <input id="login-pass" type="password" style="${field}">
             </div>
           </div>
