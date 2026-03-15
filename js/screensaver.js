@@ -2,7 +2,7 @@
 //  SCREENSAVER
 // ════════════════════════════════
 (function () {
-  const IDLE_MS = 10000;
+  const IDLE_MS = 20000;
   let idleTimer = null;
   let active = false;
   let overlay, video;
@@ -35,6 +35,9 @@
 
     video.loop = true;
     video.addEventListener('ended', () => { video.currentTime = 0; video.play(); });
+
+    // Start buffering the video 2s after page load so it's ready when the screensaver triggers
+    setTimeout(() => { video.preload = 'auto'; video.load(); }, 2000);
 
     overlay.addEventListener('click',     hideScreensaver);
     overlay.addEventListener('mousemove', hideScreensaver);
