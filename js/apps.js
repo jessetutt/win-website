@@ -402,17 +402,18 @@ function ieGo() {
 
 function ieFrameLoaded(frame) {
   const status  = document.getElementById('ie-status');
-  const addr    = document.getElementById('ie-address');
   const blocked = document.getElementById('ie-blocked');
   if (status) status.textContent = 'Done';
-  // Try to detect blocked frame (document will be empty/about:blank cross-origin)
+  if (!frame.src || frame.src === 'about:blank') return;
   try {
-    const loc = frame.contentWindow.location.href;
-    if (loc === 'about:blank' && frame.src && frame.src !== 'about:blank') {
-      if (blocked) { blocked.textContent = 'Error: This page cannot be displayed.'; blocked.style.display = 'block'; frame.style.display = 'none'; }
+    // Cross-origin pages that loaded OK throw here — browser error pages don't
+    const body = frame.contentDocument && frame.contentDocument.body;
+    if (body) {
+      if (blocked) { blocked.textContent = 'Error: This page cannot be displayed.'; blocked.style.display = 'block'; }
+      frame.style.display = 'none';
     }
   } catch(e) {
-    // Cross-origin — page loaded but we can't read the URL, which is fine
+    // Cross-origin exception means the page loaded successfully
   }
 }
 
