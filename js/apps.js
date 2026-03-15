@@ -543,7 +543,7 @@ function buildShutdownWindow(container) {
 }
 
 function buildBioWindow(container) {
-  const s = "font-family:'Fixedsys','Courier New',monospace;font-size:16px;line-height:1.6;color:#000;";
+  const s = "font-family:'Fixedsys','Courier New',monospace;font-size:16px;line-height:1.6;color:#000;padding:8px;";
   const a = 'color:#000080;text-decoration:underline;cursor:pointer;';
   container.innerHTML = `
     <div class="window-menubar">
@@ -552,28 +552,15 @@ function buildBioWindow(container) {
       <span class="menu-item"><u>S</u>earch</span>
       <span class="menu-item"><u>H</u>elp</span>
     </div>
-    <div class="window-content" style="padding:8px;overflow:auto;">
-      <div style="${s}">
-        <p style="margin-bottom:12px;">Nat Miletic is the founder of <a href="https://cliowebsites.com" target="_blank" style="${a}">Clio Websites</a>, a Calgary web design company. With a BCIS and an MBA under his belt, Nat's all about helping businesses thrive online with his sharp eye for detail and relentless passion for making things better.</p>
-        <p style="margin-bottom:12px;">From crafting sleek WordPress websites to boosting SEO and ensuring everything works smoothly across devices, Nat's helped businesses big and small grow their online presence. Whether it's global brands like MyFitnessPal or local favorites like Galvanic, his work has made websites not only look great but also perform better in search results.</p>
-        <p style="margin-bottom:12px;">Nat's been in the web development and marketing game since the early 2000s, and he loves sharing his insights with thousands of followers on social media.</p>
-        <p style="margin-bottom:12px;">Oh, and did we mention? He's also the author of <a href="https://clientbytes.gumroad.com/l/dev-agency-and-freelancer-sales" target="_blank" style="${a}">Client Bytes – Dev Agency and Freelancer Sales</a> and has created several WordPress and SEO courses available on Gumroad and Udemy. He also co-hosts a podcast called The Agency Hustle with Kyle Prinsloo.</p>
-      </div>
-    </div>
-  `;
-  container.style.cssText = 'display:flex;flex-direction:column;padding-bottom:32px;background:#c6c6c6;';
-}
-
-function buildNotepadWindow(container) {
-  container.innerHTML = `
-    <div class="window-menubar">
-      <span class="menu-item">File</span>
-      <span class="menu-item">Edit</span>
-      <span class="menu-item">Search</span>
-      <span class="menu-item">Help</span>
-    </div>
     <div class="notepad-edit-row">
-      <textarea class="notepad-ta" wrap="off"></textarea>
+      <div class="notepad-ta" style="overflow:hidden;display:block;white-space:normal;cursor:default;">
+        <div style="${s}">
+          <p style="margin-bottom:12px;">Nat Miletic is the founder of <a href="https://cliowebsites.com" target="_blank" style="${a}">Clio Websites</a>, a Calgary web design company. With a BCIS and an MBA under his belt, Nat's all about helping businesses thrive online with his sharp eye for detail and relentless passion for making things better.</p>
+          <p style="margin-bottom:12px;">From crafting sleek WordPress websites to boosting SEO and ensuring everything works smoothly across devices, Nat's helped businesses big and small grow their online presence. Whether it's global brands like MyFitnessPal or local favorites like Galvanic, his work has made websites not only look great but also perform better in search results.</p>
+          <p style="margin-bottom:12px;">Nat's been in the web development and marketing game since the early 2000s, and he loves sharing his insights with thousands of followers on social media.</p>
+          <p style="margin-bottom:12px;">Oh, and did we mention? He's also the author of <a href="https://clientbytes.gumroad.com/l/dev-agency-and-freelancer-sales" target="_blank" style="${a}">Client Bytes – Dev Agency and Freelancer Sales</a> and has created several WordPress and SEO courses available on Gumroad and Udemy. He also co-hosts a podcast called The Agency Hustle with Kyle Prinsloo.</p>
+        </div>
+      </div>
       <div class="notepad-vscroll">
         <button class="notepad-scroll-btn notepad-scroll-up"></button>
         <div class="notepad-vtrack">
@@ -583,7 +570,6 @@ function buildNotepadWindow(container) {
       </div>
     </div>
     <div class="status-bar">
-      <span class="status-item notepad-status-item" id="notepad-pos">Ln 1, Col 1</span>
       <div class="notepad-hscroll">
         <button class="notepad-scroll-btn notepad-scroll-left"></button>
         <div class="notepad-htrack">
@@ -607,14 +593,108 @@ function buildNotepadWindow(container) {
   const vup    = container.querySelector('.notepad-scroll-up');
   const vdown  = container.querySelector('.notepad-scroll-down');
 
-  function updateNotepadPos() {
-    const val = ta.value.substring(0, ta.selectionStart);
-    const lines = val.split('\n');
-    const ln  = lines.length;
-    const col = lines[lines.length - 1].length + 1;
-    const el  = document.getElementById('notepad-pos');
-    if (el) el.textContent = `Ln ${ln}, Col ${col}`;
+  function updateHScroll() {
+    const scrollable = ta.scrollWidth - ta.clientWidth;
+    if (scrollable <= 0) { hthumb.style.width = '0'; return; }
+    const trackW = htrack.clientWidth;
+    const thumbW = Math.max(20, (ta.clientWidth / ta.scrollWidth) * trackW);
+    const thumbL = (ta.scrollLeft / scrollable) * (trackW - thumbW);
+    hthumb.style.width = thumbW + 'px';
+    hthumb.style.left  = thumbL + 'px';
   }
+
+  function updateVScroll() {
+    const scrollable = ta.scrollHeight - ta.clientHeight;
+    if (scrollable <= 0) { vthumb.style.height = '0'; return; }
+    const trackH = vtrack.clientHeight;
+    const thumbH = Math.max(20, (ta.clientHeight / ta.scrollHeight) * trackH);
+    const thumbT = (ta.scrollTop / scrollable) * (trackH - thumbH);
+    vthumb.style.height = thumbH + 'px';
+    vthumb.style.top    = thumbT + 'px';
+  }
+
+  ta.addEventListener('scroll', () => { updateHScroll(); updateVScroll(); });
+
+  hleft.addEventListener('click',  () => { ta.scrollLeft -= 20; updateHScroll(); });
+  hright.addEventListener('click', () => { ta.scrollLeft += 20; updateHScroll(); });
+  vup.addEventListener('click',    () => { ta.scrollTop  -= 20; updateVScroll(); });
+  vdown.addEventListener('click',  () => { ta.scrollTop  += 20; updateVScroll(); });
+
+  let hDrag = false, hDragX = 0, hScrollL = 0;
+  hthumb.addEventListener('mousedown', e => {
+    hDrag = true; hDragX = e.clientX; hScrollL = ta.scrollLeft; e.preventDefault();
+  });
+
+  let vDrag = false, vDragY = 0, vScrollT = 0;
+  vthumb.addEventListener('mousedown', e => {
+    vDrag = true; vDragY = e.clientY; vScrollT = ta.scrollTop; e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (hDrag) {
+      const scrollable = ta.scrollWidth - ta.clientWidth;
+      ta.scrollLeft = hScrollL + (e.clientX - hDragX) * (scrollable / (htrack.clientWidth - hthumb.offsetWidth));
+      updateHScroll();
+    }
+    if (vDrag) {
+      const scrollable = ta.scrollHeight - ta.clientHeight;
+      ta.scrollTop = vScrollT + (e.clientY - vDragY) * (scrollable / (vtrack.clientHeight - vthumb.offsetHeight));
+      updateVScroll();
+    }
+  });
+  document.addEventListener('mouseup', () => { hDrag = false; vDrag = false; });
+
+  ta.addEventListener('wheel', e => {
+    e.preventDefault();
+    ta.scrollTop += e.deltaY;
+    updateVScroll();
+  }, { passive: false });
+
+  setTimeout(() => { updateHScroll(); updateVScroll(); }, 50);
+}
+
+function buildNotepadWindow(container) {
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>F</u>ile</span>
+      <span class="menu-item"><u>E</u>dit</span>
+      <span class="menu-item"><u>S</u>earch</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <div class="notepad-edit-row">
+      <textarea class="notepad-ta" wrap="off"></textarea>
+      <div class="notepad-vscroll">
+        <button class="notepad-scroll-btn notepad-scroll-up"></button>
+        <div class="notepad-vtrack">
+          <div class="notepad-vthumb"></div>
+        </div>
+        <button class="notepad-scroll-btn notepad-scroll-down"></button>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="notepad-hscroll">
+        <button class="notepad-scroll-btn notepad-scroll-left"></button>
+        <div class="notepad-htrack">
+          <div class="notepad-hthumb"></div>
+        </div>
+        <button class="notepad-scroll-btn notepad-scroll-right"></button>
+      </div>
+      <div class="status-resize-slot"></div>
+    </div>
+  `;
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
+  const ta     = container.querySelector('.notepad-ta');
+  const htrack = container.querySelector('.notepad-htrack');
+  const hthumb = container.querySelector('.notepad-hthumb');
+  const hleft  = container.querySelector('.notepad-scroll-left');
+  const hright = container.querySelector('.notepad-scroll-right');
+  const vtrack = container.querySelector('.notepad-vtrack');
+  const vthumb = container.querySelector('.notepad-vthumb');
+  const vup    = container.querySelector('.notepad-scroll-up');
+  const vdown  = container.querySelector('.notepad-scroll-down');
+
 
   function updateHScroll() {
     const scrollable = ta.scrollWidth - ta.clientWidth;
@@ -636,8 +716,6 @@ function buildNotepadWindow(container) {
     vthumb.style.top    = thumbT + 'px';
   }
 
-  ta.addEventListener('keyup',   updateNotepadPos);
-  ta.addEventListener('click',   updateNotepadPos);
   ta.addEventListener('scroll',  () => { updateHScroll(); updateVScroll(); });
   ta.addEventListener('input',   () => { updateHScroll(); updateVScroll(); });
 

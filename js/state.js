@@ -25,7 +25,7 @@ const ICONS = {
 
   recycle: `img/recycle-bin.png`,
 
-  notepad: `img/notepad.png`,
+  notepad: `img/notepad2.png`,
 
   welcome: `img/welcome.png`,
 
