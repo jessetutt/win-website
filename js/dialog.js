@@ -16,6 +16,18 @@ function hideDialog() {
   const backdrop = document.getElementById('shutdown-backdrop');
   if (backdrop) backdrop.remove();
 }
+function doLogoff() {
+  document.body.innerHTML = `
+    <div style="background:#008080;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
+      <p style="color:#fff;font-family:'MS Sans Serif',Arial,sans-serif;font-size:16px;text-align:center;">
+        Please wait while Windows logs you off...
+      </p>
+      <button onclick="location.reload()" style="padding:6px 24px;font-size:12px;cursor:pointer;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:0 0 0 1px #000;font-family:'MS Sans Serif',Arial,sans-serif;">
+        Log on again
+      </button>
+    </div>`;
+}
+
 function doShutdownAction() {
   const opt = (document.querySelector('input[name="shutdown-opt"]:checked') || {}).value || 'shutdown';
   closeWindow('shutdown');
@@ -24,15 +36,7 @@ function doShutdownAction() {
   if (opt === 'restart') {
     reboot();
   } else if (opt === 'logoff') {
-    document.body.innerHTML = `
-      <div style="background:#008080;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;">
-        <p style="color:#fff;font-family:'MS Sans Serif',Arial,sans-serif;font-size:16px;text-align:center;">
-          Please wait while Windows logs you off...
-        </p>
-        <button onclick="location.reload()" style="padding:6px 24px;font-size:12px;cursor:pointer;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:0 0 0 1px #000;font-family:'MS Sans Serif',Arial,sans-serif;">
-          Log on again
-        </button>
-      </div>`;
+    doLogoff();
   } else if (opt === 'msdos') {
     document.body.innerHTML = `
       <style>
