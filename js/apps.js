@@ -358,12 +358,7 @@ function buildIEWindow(container) {
     <div class="ie-content" id="ie-content">
       <iframe id="ie-frame" src="${HOME}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         onload="ieFrameLoaded(this)" onerror="ieFrameError()"></iframe>
-      <div class="ie-blocked" id="ie-blocked" style="display:none;">
-        <img src="img/internet-explorer.png" style="width:48px;height:48px;image-rendering:pixelated;">
-        <div class="ie-blocked-title">This page cannot be displayed</div>
-        <div class="ie-blocked-msg">The website declined to connect.<br>This is usually caused by security restrictions (X-Frame-Options).</div>
-        <button class="dialog-btn" style="margin-top:12px;" onclick="window.open(document.getElementById('ie-address').value,'_blank')">Open in new tab ↗</button>
-      </div>
+      <div id="ie-blocked" style="display:none;position:absolute;inset:0;background:#fff;padding:12px;font-family:Arial,sans-serif;font-size:13px;color:#000;"></div>
     </div>
 
     <div class="status-bar">
@@ -395,7 +390,7 @@ function ieLoad(url) {
   const blocked = document.getElementById('ie-blocked');
   const status  = document.getElementById('ie-status');
   if (addr)    addr.value = url;
-  if (blocked) blocked.style.display = 'none';
+  if (blocked) { blocked.style.display = 'none'; blocked.textContent = ''; }
   if (frame)   { frame.style.display = 'block'; frame.src = url; }
   if (status)  status.textContent = 'Connecting to ' + url + '...';
 }
@@ -414,17 +409,18 @@ function ieFrameLoaded(frame) {
   try {
     const loc = frame.contentWindow.location.href;
     if (loc === 'about:blank' && frame.src && frame.src !== 'about:blank') {
-      if (blocked) { blocked.style.display = 'flex'; frame.style.display = 'none'; }
+      if (blocked) { blocked.textContent = 'Error: This page cannot be displayed.'; blocked.style.display = 'block'; frame.style.display = 'none'; }
     }
   } catch(e) {
     // Cross-origin — page loaded but we can't read the URL, which is fine
   }
 }
 
-function ieFrameError() {
+function ieFrameError(e) {
   const blocked = document.getElementById('ie-blocked');
   const frame   = document.getElementById('ie-frame');
-  if (blocked) { blocked.style.display = 'flex'; }
+  const msg = (e && e.message) ? e.message : 'The page could not be loaded.';
+  if (blocked) { blocked.textContent = 'Error: ' + msg; blocked.style.display = 'block'; }
   if (frame)   frame.style.display = 'none';
 }
 
