@@ -1135,10 +1135,9 @@ function buildDefragWindow(container, type) {
     for (let r = 0; r < ROWS_MAX; r++) {
       for (let c = 0; c < cols; c++) {
         const i = r * cols + c, rnd = Math.random();
-        if (r < 2) grid[i] = SYS;
-        else if (rnd < 0.07) grid[i] = FREE;
+        if      (rnd < 0.07) grid[i] = FREE;
         else if (rnd < 0.13) grid[i] = FRAG;
-        else grid[i] = USED;
+        else                 grid[i] = USED;
       }
     }
   }
@@ -1166,8 +1165,8 @@ function buildDefragWindow(container, type) {
       return;
     }
     if (t === DEFRAG) {
-      // Dark blue with black checkerboard dots (like taskbar active tiles)
-      ctx.fillStyle = '#000088';
+      // Completed blue with black checkerboard dots (like taskbar active tiles)
+      ctx.fillStyle = '#1e83e2';
       ctx.fillRect(x, y, BW, BH);
       ctx.fillStyle = '#000000';
       for (let dy = 0; dy < BH; dy++)
@@ -1178,7 +1177,7 @@ function buildDefragWindow(container, type) {
     // USED or SYS — bevelled block
     const [fill, hi, sh] = t === SYS
       ? ['#0000A8', '#2828C8', '#000060']
-      : ['#00BBBB', '#40EEEE', '#007070'];
+      : ['#0ce3f4', '#80f4ff', '#088898'];
     ctx.fillStyle = fill; ctx.fillRect(x + 1, y + 1, BW - 1, BH - 1);
     ctx.fillStyle = hi;   ctx.fillRect(x, y, BW - 1, 1); ctx.fillRect(x, y + 1, 1, BH - 1);
     ctx.fillStyle = sh;   ctx.fillRect(x + 1, y + BH - 1, BW - 1, 1); ctx.fillRect(x + BW - 1, y + 1, 1, BH - 1);
