@@ -594,7 +594,7 @@ function buildWelcomeWindow(container) {
 
 function buildShutdownWindow(container) {
   container.innerHTML = `
-    <div style="display:flex;gap:14px;padding:4px 16px 0;align-items:flex-start;">
+    <div style="display:flex;gap:14px;padding:14px 16px 0;align-items:flex-start;">
       <img src="img/shutdown.ico" style="width:41px;height:41px;image-rendering:pixelated;flex-shrink:0;margin-top:2px;">
       <div style="flex:1;">
         <p style="margin-bottom:10px;font-size:12px;font-family:'w95fa','MS Sans Serif',Tahoma,sans-serif;">Are you sure you want to:</p>
@@ -618,7 +618,7 @@ function buildShutdownWindow(container) {
         </div>
       </div>
     </div>
-    <div style="display:flex;justify-content:center;gap:8px;padding:4px 14px 12px;">
+    <div style="display:flex;justify-content:center;gap:8px;padding:30px 14px 12px;">
       <button class="dialog-btn" onclick="doShutdownAction()"><u>Y</u>es</button>
       <button class="dialog-btn" onclick="closeWindow('shutdown')"><u>N</u>o</button>
       <button class="dialog-btn" onclick="closeWindow('shutdown')"><u>H</u>elp</button>
@@ -1324,7 +1324,7 @@ const WINDOW_DEFS = {
   },
   shutdown: {
     title: 'Shut Down Windows',
-    width: 374, height: 240,
+    width: 374, height: 215,
     icon: 'shutdown',
     noIcon: true,
     noResize: true,
