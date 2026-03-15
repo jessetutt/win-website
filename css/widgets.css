@@ -109,6 +109,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  background: var(--c-gray-200);
 }
 .notepad-vtrack {
   flex: 1;
