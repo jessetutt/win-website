@@ -253,7 +253,15 @@
     width: 240px;
   }
 
-  /* All submenus always visible — no hover needed */
+  /* Parent items that have submenus must wrap so the submenu
+     drops onto its own row (they are display:flex, so without
+     flex-wrap the submenu appears inline to the right) */
+  .start-menu-item.has-submenu,
+  .start-submenu-item.has-submenu {
+    flex-wrap: wrap;
+  }
+
+  /* All submenus always visible, full-width on their own row */
   .start-submenu {
     display: block !important;
     position: static;
@@ -264,21 +272,22 @@
     border: none;
     min-width: 0;
     padding: 0;
+    flex-basis: 100%; /* break onto new row inside the flex parent */
   }
 
-  /* Indent level 1 (e.g. Programs > items) */
+  /* Indent level 1 (Programs > items) */
   .start-submenu > .start-submenu-item,
   .start-submenu > .has-submenu {
     padding-left: 20px;
   }
 
-  /* Indent level 2 (e.g. Programs > Accessories > items) */
+  /* Indent level 2 (Programs > Accessories > items) */
   .start-submenu .start-submenu > .start-submenu-item,
   .start-submenu .start-submenu > .has-submenu {
     padding-left: 36px;
   }
 
-  /* Indent level 3 (e.g. Programs > Accessories > Games > items) */
+  /* Indent level 3 (Programs > Accessories > Games > items) */
   .start-submenu .start-submenu .start-submenu > .start-submenu-item {
     padding-left: 52px;
   }
