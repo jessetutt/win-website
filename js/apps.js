@@ -1073,7 +1073,6 @@ function buildDefragWindow(container, type) {
   const BW = 9, BH = 7, GAP = 1;
   const CW = BW + GAP, CH = BH + GAP; // cell stride: 10w × 8h
   const ROWS_MAX = 150;               // total rows for ~15 min run
-  const INTERVAL_MS = 100;            // ms per block → 150×COLS×100ms ≈ 15 min
 
   const USED = 0, SYS = 1, FRAG = 2, FREE = 3, HEAD = 4;
   const PAL = [
@@ -1132,7 +1131,9 @@ function buildDefragWindow(container, type) {
 
   let COLS = 0, ROWS_INITIAL = 0;
   let grid, currentRows, headPos, scrollOffset;
-  let lastTs = 0;
+  let lastTs = 0, nextInterval = 200;
+
+  function randInterval() { return 150 + Math.random() * 300; } // 150–450ms
 
   function initGrid(cols) {
     grid = new Uint8Array(ROWS_MAX * cols);
@@ -1221,8 +1222,9 @@ function buildDefragWindow(container, type) {
   // ── Animation tick ──────────────────────────
   function tick(ts) {
     if (!document.getElementById(cvId)) return; // window closed
-    if (ts - lastTs < INTERVAL_MS) { requestAnimationFrame(tick); return; }
+    if (ts - lastTs < nextInterval) { requestAnimationFrame(tick); return; }
     lastTs = ts;
+    nextInterval = randInterval();
 
     // Reveal rows one-at-a-time as head progresses
     const targetRows = Math.min(ROWS_MAX, ROWS_INITIAL + Math.floor(headPos / COLS));
