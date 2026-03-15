@@ -9,6 +9,11 @@
   overflow: hidden;
 }
 
+/* ── Desktop Icons wrapper ── */
+#desktop-icons {
+  position: relative; /* icons inside position relative to this, which sits at 0,0 of #desktop */
+}
+
 /* ── Desktop Icons ── */
 .desktop-icon {
   position: absolute;
@@ -44,6 +49,24 @@
   padding: 1px 2px;
   line-height: 1.3;
   word-break: break-word;
+}
+
+/* ════════════════════════════════
+   MOBILE: two-column icon grid
+   ════════════════════════════════ */
+@media (max-width: 768px) {
+  #desktop-icons {
+    display: grid;
+    grid-template-columns: repeat(2, 76px);
+    gap: 4px;
+    padding: 8px;
+    align-content: start;
+  }
+  #desktop-icons .desktop-icon {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+  }
 }
 
 /* ════════════════════════════════

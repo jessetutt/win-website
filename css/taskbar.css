@@ -242,3 +242,44 @@
   flex-shrink: 0;
 }
 .start-submenu-item .item-text { flex: 1; }
+
+/* ════════════════════════════════
+   MOBILE: always-expanded submenus
+   ════════════════════════════════ */
+@media (max-width: 768px) {
+  #start-menu {
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    width: 240px;
+  }
+
+  /* All submenus always visible — no hover needed */
+  .start-submenu {
+    display: block !important;
+    position: static;
+    left: auto;
+    top: auto;
+    box-shadow: none;
+    background: transparent;
+    border: none;
+    min-width: 0;
+    padding: 0;
+  }
+
+  /* Indent level 1 (e.g. Programs > items) */
+  .start-submenu > .start-submenu-item,
+  .start-submenu > .has-submenu {
+    padding-left: 20px;
+  }
+
+  /* Indent level 2 (e.g. Programs > Accessories > items) */
+  .start-submenu .start-submenu > .start-submenu-item,
+  .start-submenu .start-submenu > .has-submenu {
+    padding-left: 36px;
+  }
+
+  /* Indent level 3 (e.g. Programs > Accessories > Games > items) */
+  .start-submenu .start-submenu .start-submenu > .start-submenu-item {
+    padding-left: 52px;
+  }
+}
