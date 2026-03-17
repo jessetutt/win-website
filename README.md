@@ -1,16 +1,17 @@
-# Nat Miletic's Windows 95 Portfolio Website
+# This is a fork of Nat Miletic's Windows 95 Portfolio Website
 
 A nostalgic, interactive Windows 95 desktop simulation built as a personal portfolio — running entirely in the browser with no frameworks or dependencies.
 
 Open windows, browse files, shut down the computer, and relive the golden era of chunky beveled buttons and teal desktops.
 
-**[View Live Demo →](https://natmiletic.github.io/win-website)**
+**[View Live Demo →](https://jessetutt.github.io/win-website)**
 
 ---
 
 ## Features
 
 - Draggable, resizable windows with authentic Win95 chrome
+- Kings Quest
 - Functional Start Menu with nested submenus and shutdown dialog
 - Welcome screen with rotating "Did you know..." tips
 - My Files explorer with folder navigation (Documents, Photos)
@@ -39,6 +40,8 @@ Pure HTML, CSS, and vanilla JavaScript — no frameworks, no build tools.
 This project draws inspiration and references from several excellent open-source projects:
 
 - **[React95](https://github.com/react95-io/React95)** — the gold standard for Windows 95 UI components in React. The border system, color palette, resize handle, and overall theme are closely modelled after React95's original theme.
+
+- King's Quest III - My first video game
 
 - **[95CSS by Yoshi Mannaert](https://github.com/yoshimannaert/95CSS)** — a fantastic CSS-only Win95 stylesheet. Referenced for scrollbar styling and dialog layout patterns.
 
