@@ -44,5 +44,7 @@ const ICONS = {
   briefcase: `img/briefcase.png`,
 
   defrag: `img/defrag.png`,
+
+  kingsquest: `img/cdrom.png`,
 };
 

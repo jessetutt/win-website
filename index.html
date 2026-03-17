@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nat Miletic's Windows 95 Portfolio Website</title>
-  <meta name="description" content="Step back into 1995 — Nat Miletic's interactive portfolio built as a fully functional Windows 95 desktop simulation. Explore files, open windows, and discover the story of a Calgary web designer and founder of Clio Websites, all wrapped in glorious retro UI.">
-  <meta property="og:title" content="Nat Miletic's Windows 95 Portfolio Website">
-  <meta property="og:description" content="Step back into 1995 — an interactive portfolio built as a fully functional Windows 95 desktop simulation. Explore files, open windows, and discover the story of a Calgary web designer.">
+  <title>Jesse Tutt's Windows 95 Portfolio Website</title>
+  <meta name="description" content="Step back into 1995 — Jesse Tutt's interactive portfolio built as a fully functional Windows 95 desktop simulation. Explore files, open windows, and discover Jesse's story, all wrapped in glorious retro UI.">
+  <meta property="og:title" content="Jesse Tutt's Windows 95 Portfolio Website">
+  <meta property="og:description" content="Step back into 1995 — an interactive portfolio built as a fully functional Windows 95 desktop simulation. Explore files, open windows, and discover Jesse Tutt's story.">
   <meta property="og:image" content="img/social-preview.jpg">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Nat Miletic's Windows 95 Portfolio Website">
+  <meta name="twitter:title" content="Jesse Tutt's Windows 95 Portfolio Website">
   <meta name="twitter:description" content="Step back into 1995 — an interactive portfolio built as a fully functional Windows 95 desktop simulation.">
   <meta name="twitter:image" content="img/social-preview.jpg">
   <link rel="stylesheet" href="css/variables.css">
@@ -77,26 +77,35 @@
     <span class="icon-label">My Briefcase</span>
   </div>
 
-  <!-- Nat Miletic Bio icon -->
+  <!-- Jesse Tutt Bio icon -->
   <div class="desktop-icon" id="icon-bio" style="top:392px;left:14px;"
        draggable="true"
-       ondragstart="iconDragStart(event,'icon-bio','Nat Miletic Bio','img/notepad.png')"
+       ondragstart="iconDragStart(event,'icon-bio','Jesse Tutt Bio','img/notepad.png')"
        onclick="selectIcon(event,'icon-bio')" ondblclick="openWindow('bio')">
-    <img src="img/notepad.png" alt="Nat Miletic Bio">
-    <span class="icon-label">Nat Miletic Bio</span>
+    <img src="img/notepad.png" alt="Jesse Tutt Bio">
+    <span class="icon-label">Jesse Tutt Bio</span>
   </div>
 
   <!-- LinkedIn icon -->
   <div class="desktop-icon" id="icon-linkedin" style="top:486px;left:14px;"
        draggable="true"
        ondragstart="iconDragStart(event,'icon-linkedin','LinkedIn','img/linkedin.png')"
-       onclick="selectIcon(event,'icon-linkedin')" ondblclick="window.open('https://linkedin.com/in/natmiletic','_blank')">
+       onclick="selectIcon(event,'icon-linkedin')" ondblclick="window.open('https://linkedin.com/in/jessetutt/','_blank')">
     <img src="img/linkedin.png" alt="LinkedIn">
     <span class="icon-label">LinkedIn</span>
   </div>
 
+  <!-- King's Quest III icon -->
+  <div class="desktop-icon" id="icon-kingsquest" style="top:580px;left:14px;"
+       draggable="true"
+       ondragstart="iconDragStart(event,'icon-kingsquest','King\\'s Quest III','img/cdrom.png')"
+       onclick="selectIcon(event,'icon-kingsquest')" ondblclick="openWindow('kingsquest')">
+    <img src="img/cdrom.png" alt="King's Quest III">
+    <span class="icon-label">King's Quest III</span>
+  </div>
+
   <!-- Recycle Bin icon -->
-  <div class="desktop-icon" id="icon-recycle" style="top:580px;left:14px;"
+  <div class="desktop-icon" id="icon-recycle" style="top:674px;left:14px;"
        onclick="selectIcon(event,'icon-recycle')" ondblclick="openWindow('recycle')"
        ondragover="recycleDragOver(event)" ondragleave="recycleDragLeave(event)" ondrop="recycleDrop(event)">
     <img src="img/recycle-bin.png" alt="Recycle Bin">
@@ -159,6 +168,10 @@
                 <div class="start-submenu-item" onclick="openWindow('minesweeper');closeStartMenu()">
                   <img src="img/minesweeper.png" alt="">
                   <span class="item-text">Minesweeper</span>
+                </div>
+                <div class="start-submenu-item" onclick="openWindow('kingsquest');closeStartMenu()">
+                  <img src="img/cdrom.png" alt="">
+                  <span class="item-text">King's Quest III</span>
                 </div>
               </div>
             </div>

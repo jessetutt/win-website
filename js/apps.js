@@ -5,7 +5,7 @@ function buildFilesWindow(container) {
   const files = [
     { name: 'Documents', icon: ICONS.files },
     { name: 'Photos',    icon: ICONS.files },
-    { name: 'Nat Miletic Bio', icon: ICONS.textFile },
+    { name: 'Jesse Tutt Bio', icon: ICONS.textFile },
   ];
 
   container.innerHTML = `
@@ -34,9 +34,8 @@ function buildFilesWindow(container) {
 
 function buildDocumentsWindow(container) {
   const files = [
-    { name: 'Clio Websites Portfolio', url: 'https://cliowebsites.com/portfolio' },
-    { name: 'Websites USA Portfolio',  url: 'https://websitesusa.com/our-work/' },
-    { name: 'Nat Miletic Github',      url: 'https://github.com/natmiletic' },
+    { name: 'Jesse Tutt Portfolio',    url: 'https://jessetutt.com' },
+    { name: 'Jesse Tutt Github',       url: 'https://github.com/jessetutt' },
   ];
   container.innerHTML = `
     <div class="window-menubar">
@@ -63,7 +62,7 @@ function buildDocumentsWindow(container) {
 
 function buildPhotosWindow(container) {
   const photos = [
-    { name: 'Nat Miletic Headshot', src: 'img/headshot.png', icon: ICONS.imageFile },
+    { name: 'Jesse Tutt Headshot', src: 'img/headshot.jpg', icon: ICONS.imageFile },
   ];
   container.innerHTML = `
     <div class="window-menubar">
@@ -258,9 +257,8 @@ function buildPaintWindow(container) {
 
 function buildBriefcaseWindow(container) {
   const files = [
-    { name: 'Clio Websites Portfolio',  url: 'https://cliowebsites.com/portfolio' },
-    { name: 'Websites USA Portfolio',   url: 'https://websitesusa.com/our-work/' },
-    { name: 'Nat Miletic Github',       url: 'https://github.com/natmiletic' },
+    { name: 'Jesse Tutt Portfolio',     url: 'https://jessetutt.com' },
+    { name: 'Jesse Tutt Github',        url: 'https://github.com/jessetutt' },
   ];
   container.innerHTML = `
     <div class="window-menubar">
@@ -321,12 +319,12 @@ function buildRecycleWindow(container) {
 }
 
 function buildIEWindow(container) {
-  const HOME = 'https://cliowebsites.com';
+  const HOME = 'https://jessetutt.com';
   ieHistory = [HOME];
   ieHistoryIndex = 0;
 
   const LINKS = [
-    { label: 'Clio Websites', url: 'https://cliowebsites.com' },
+    { label: 'Jesse Tutt', url: 'https://jessetutt.com' },
     { label: 'Microsoft',     url: 'https://microsoft.com' },
   ];
 
@@ -433,7 +431,7 @@ function ieNav(action) {
   }
   if (action === 'stop')    { frame.src = frame.src; }
   if (action === 'refresh') { try { frame.contentWindow.location.reload(); } catch(e){ frame.src = frame.src; } }
-  if (action === 'home')    { ieLoad('https://cliowebsites.com'); }
+  if (action === 'home')    { ieLoad('https://jessetutt.com'); }
 }
 
 function ieLoad(url, isBack) {
@@ -573,7 +571,7 @@ function buildWelcomeWindow(container) {
             <div style="font-size:14px;font-weight:bold;margin-bottom:6px;">Welcome to my Windows 95 portfolio website.</div>
             <div style="font-size:12px;line-height:1.6;">I decided to vibe code this nostalgic portfolio website with Claude Code. I hope you enjoy it!</div>
           </div>
-          <img src="img/headshot.png" style="width:140px;height:140px;image-rendering:pixelated;display:block;flex-shrink:0;">
+          <img src="img/headshot.jpg" style="width:140px;height:140px;image-rendering:pixelated;display:block;flex-shrink:0;">
         </div>
 
         <!-- Right: buttons -->
@@ -641,10 +639,9 @@ function buildBioWindow(container) {
     <div class="notepad-edit-row">
       <div class="notepad-ta" style="overflow:hidden;display:block;white-space:normal;">
         <div style="${s}">
-          <p style="margin-bottom:12px;">Nat Miletic is the founder of <a href="https://cliowebsites.com" target="_blank" style="${a}">Clio Websites</a> and co-founder of <a href="https://websitesusa.com" target="_blank" style="${a}">Websites USA</a>. With a BCIS and an MBA under his belt, Nat's all about helping businesses thrive online with his sharp eye for detail and relentless passion for making things better.</p>
-          <p style="margin-bottom:12px;">From crafting sleek WordPress websites to boosting SEO and ensuring everything works smoothly across devices, Nat's helped businesses big and small grow their online presence. Whether it's global brands like MyFitnessPal or local favorites like Galvanic, his work has made websites not only look great but also perform better in search results.</p>
-          <p style="margin-bottom:12px;">Nat's been in the web development and marketing game since the early 2000s, and he loves sharing his insights with thousands of followers on social media.</p>
-          <p style="margin-bottom:12px;">Oh, and did we mention? He's also the author of <a href="https://clientbytes.gumroad.com/l/dev-agency-and-freelancer-sales" target="_blank" style="${a}">Client Bytes – Dev Agency and Freelancer Sales</a> and has created several WordPress and SEO courses available on Gumroad and Udemy. He also co-hosts a podcast called The Agency Hustle with Kyle Prinsloo.</p>
+          <p style="margin-bottom:12px;">Jesse Tutt is a software engineer and developer with a passion for building things that work beautifully. You can find his work and projects at <a href="https://jessetutt.com" target="_blank" style="${a}">jessetutt.com</a>.</p>
+          <p style="margin-bottom:12px;">With experience spanning web development, software engineering, and creative problem solving, Jesse brings a sharp technical eye and a drive to craft great user experiences.</p>
+          <p style="margin-bottom:12px;">Connect with Jesse on <a href="https://linkedin.com/in/jessetutt/" target="_blank" style="${a}">LinkedIn</a> or check out his code on <a href="https://github.com/jessetutt" target="_blank" style="${a}">GitHub</a>.</p>
         </div>
       </div>
       <div class="notepad-vscroll">
@@ -1335,6 +1332,25 @@ function buildDefragWindow(container, type) {
 }
 
 // ════════════════════════════════
+//  KING'S QUEST III
+// ════════════════════════════════
+function buildKingsQuestWindow(container) {
+  container.style.cssText = 'display:flex;flex-direction:column;background:#000;';
+  container.innerHTML = `
+    <div class="window-menubar">
+      <span class="menu-item"><u>G</u>ame</span>
+      <span class="menu-item"><u>H</u>elp</span>
+    </div>
+    <iframe
+      src="https://sarien.net/kingsquest3"
+      style="flex:1;border:none;width:100%;display:block;"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+      allowfullscreen
+    ></iframe>
+  `;
+}
+
+// ════════════════════════════════
 const WINDOW_DEFS = {
   computer: {
     title: 'My Computer',
@@ -1383,7 +1399,7 @@ const WINDOW_DEFS = {
     build: buildNotepadWindow,
   },
   bio: {
-    title: 'Notepad - Nat Miletic Bio',
+    title: 'Notepad - Jesse Tutt Bio',
     width: 520, height: 420,
     icon: 'notepad',
     build: buildBioWindow,
@@ -1439,5 +1455,11 @@ const WINDOW_DEFS = {
     icon: 'defrag',
     noResize: true,
     build: buildDefragWindow,
+  },
+  kingsquest: {
+    title: "King's Quest III - To Heir is Human",
+    width: 860, height: 620,
+    icon: 'kingsquest',
+    build: buildKingsQuestWindow,
   },
 };

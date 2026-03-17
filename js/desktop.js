@@ -114,7 +114,7 @@ function selectFile(el) {
 }
 
 function openFileItem(name) {
-  if (name === 'Nat Miletic Bio') { openWindow('bio'); return; }
+  if (name === 'Jesse Tutt Bio') { openWindow('bio'); return; }
   if (name === 'Photos') { openWindow('photos'); return; }
   if (name === 'Documents') { openWindow('documents'); return; }
   if (name.endsWith('.txt')) openWindow('notepad');
